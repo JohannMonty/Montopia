@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<title>Montopia</title>
+<meta name="description" content="Spieleabend für Monty & Pia">
+<meta name="theme-color" content="#14101c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Montopia">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{
+  --bg:#14101c; --surface:#1e1829; --surface2:#271f35; --line:#352b47;
+  --fg:#f4eff9; --muted:#a294b8;
+  --monty:#f4a259; --pia:#5fc9b5;
+  --good:#6ee7b7; --bad:#fb7185;
+  --r:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--fg);
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  overflow-x:hidden; overscroll-behavior:none;
+  background-image:
+    radial-gradient(900px 500px at 15% -5%, rgba(244,162,89,.10), transparent 60%),
+    radial-gradient(800px 500px at 90% 100%, rgba(95,201,181,.09), transparent 60%);
+  background-attachment:fixed;
+}
+.serif{font-family:ui-serif,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
+
+/* ---------- Grundgerüst ---------- */
+.screen{
+  display:none; flex-direction:column; min-height:100%;
+  padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+}
+.screen.on{display:flex; animation:in .28s ease both}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:18px;min-height:34px}
+.back{
+  background:var(--surface);border:1px solid var(--line);color:var(--fg);
+  width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;flex:none;
+}
+.topbar h2{font-size:16px;font-weight:600;letter-spacing:.2px;flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.step{font-size:13px;color:var(--muted);flex:none}
+
+.center{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.bottom{margin-top:auto;padding-top:18px;display:flex;flex-direction:column;gap:10px}
+
+/* ---------- Buttons ---------- */
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{
+  width:100%;padding:16px;border-radius:var(--r);border:1px solid var(--line);
+  background:var(--surface);font-weight:600;font-size:16px;text-align:center;
+  transition:transform .12s ease, background .15s ease;
+}
+.btn:active{transform:scale(.985)}
+.btn.primary{background:var(--fg);color:#140f1d;border-color:var(--fg)}
+.btn.ghost{background:transparent;color:var(--muted);border-color:var(--line);font-weight:500}
+.btn.monty{background:var(--monty);color:#241403;border-color:var(--monty)}
+.btn.pia{background:var(--pia);color:#06251f;border-color:var(--pia)}
+.btn.big{padding:22px 16px;font-size:19px}
+.btn[disabled]{opacity:.45}
+.two{display:flex;gap:12px}
+.two>.btn{flex:1 1 0;min-width:0}
+
+/* ---------- Start ---------- */
+.wordmark{font-size:clamp(40px,13vw,58px);font-weight:600;letter-spacing:-1px;line-height:1}
+.wordmark i{font-style:normal;color:var(--monty)}
+.wordmark b{font-weight:600;color:var(--pia)}
+.tagline{color:var(--muted);font-size:14px;margin-top:8px}
+
+.tiles{display:flex;flex-direction:column;gap:12px}
+.tile{
+  display:flex;align-items:center;gap:14px;text-align:left;width:100%;
+  padding:16px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);
+  transition:transform .12s ease,border-color .15s ease;
+}
+.tile:active{transform:scale(.985)}
+.tile .ic{
+  flex:none;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+  font-size:20px;background:var(--surface2);
+}
+.tile .tx{flex:1;min-width:0}
+.tile .tx b{display:block;font-size:16px;font-weight:600}
+.tile .tx span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.tile .ar{color:var(--muted);flex:none}
+
+.scoreboard{
+  display:flex;gap:10px;align-items:stretch;margin-top:18px;
+}
+.sb{
+  flex:1;padding:12px;border-radius:14px;border:1px solid var(--line);
+  background:var(--surface);text-align:center;
+}
+.sb span{display:block;font-size:12px;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
+.sb b{display:block;font-size:26px;font-weight:600;margin-top:2px}
+.sb.m b{color:var(--monty)} .sb.p b{color:var(--pia)}
+
+/* ---------- Fragen ---------- */
+.kicker{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.kicker.m{color:var(--monty)} .kicker.p{color:var(--pia)}
+.question{font-size:clamp(21px,5.6vw,28px);font-weight:600;line-height:1.3}
+.hintline{color:var(--muted);font-size:14px}
+
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{
+  width:100%;padding:16px;border-radius:14px;border:1px solid var(--line);
+  background:var(--surface);text-align:left;font-size:17px;font-weight:500;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+}
+.opt.sel{border-color:var(--fg)}
+.opt.right{background:rgba(110,231,183,.14);border-color:var(--good)}
+.opt.wrong{background:rgba(251,113,133,.12);border-color:var(--bad)}
+.opt .who{font-size:12px;color:var(--muted);flex:none}
+
+/* Slider */
+.readout{text-align:center;padding:10px 0}
+.readout b{font-size:clamp(34px,10vw,46px);font-weight:600;letter-spacing:-.5px}
+.readout span{font-size:16px;color:var(--muted);margin-left:6px}
+input[type=range]{
+  -webkit-appearance:none;width:100%;height:34px;background:transparent;
+}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:var(--surface2)}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:30px;height:30px;border-radius:50%;margin-top:-11px;
+  background:var(--fg);border:3px solid var(--bg);box-shadow:0 2px 8px rgba(0,0,0,.5);
+}
+.range-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+
+/* Auflösung */
+.truth{
+  text-align:center;padding:20px;border-radius:var(--r);
+  background:var(--surface);border:1px solid var(--line);
+}
+.truth span{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.truth b{display:block;font-size:clamp(32px,9vw,44px);font-weight:600;margin-top:4px;letter-spacing:-.5px}
+.truth i{display:block;font-style:normal;font-size:13px;color:var(--muted);margin-top:8px;line-height:1.45}
+
+.rows{display:flex;flex-direction:column;gap:10px}
+.rw{
+  display:flex;align-items:center;gap:12px;padding:13px 15px;
+  border-radius:14px;background:var(--surface);border:1px solid var(--line);
+}
+.rw .nm{font-weight:600;flex:none;width:58px}
+.rw.m .nm{color:var(--monty)} .rw.p .nm{color:var(--pia)}
+.rw .vl{flex:1;min-width:0;font-variant-numeric:tabular-nums}
+.rw .pt{flex:none;font-size:13px;color:var(--muted)}
+.rw.win{border-color:var(--good)}
+.rw.win .pt{color:var(--good)}
+
+/* Timer / Erklären */
+.timer{text-align:center;font-size:clamp(46px,15vw,70px);font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-2px}
+.timer.low{color:var(--bad)}
+.word{
+  text-align:center;font-size:clamp(28px,9vw,42px);font-weight:600;line-height:1.2;
+  padding:34px 14px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line);
+  min-height:150px;display:grid;place-items:center;
+}
+.tally{display:flex;justify-content:center;gap:20px;color:var(--muted);font-size:14px}
+.tally b{color:var(--fg)}
+
+/* Knoten */
+.solved{display:flex;flex-direction:column;gap:8px}
+.grp{padding:12px;border-radius:14px;text-align:center;background:var(--surface2);border:1px solid var(--line)}
+.grp b{display:block;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--pia)}
+.grp span{font-size:14px;color:var(--muted)}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.cell{
+  aspect-ratio:1/1;border-radius:12px;border:1px solid var(--line);background:var(--surface);
+  font-size:clamp(9px,2.7vw,12px);font-weight:600;line-height:1.15;padding:4px;
+  display:grid;place-items:center;text-align:center;word-break:break-word;hyphens:auto;
+}
+.cell.sel{background:var(--fg);color:#140f1d;border-color:var(--fg)}
+.cell.shake{animation:sh .34s}
+@keyframes sh{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.lives{display:flex;justify-content:center;gap:7px;align-items:center;color:var(--muted);font-size:13px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--bad);vertical-align:middle}
+.dot.off{background:var(--line)}
+
+/* Turm */
+.tower{display:flex;flex-direction:column-reverse;align-items:center;gap:4px;min-height:120px;justify-content:flex-start}
+.brick{width:min(68%,220px);height:13px;border-radius:5px;background:linear-gradient(90deg,var(--monty),var(--pia));opacity:.9}
+.brick:nth-child(even){width:min(58%,190px)}
+.height{text-align:center}
+.height b{font-size:clamp(40px,12vw,56px);font-weight:600;letter-spacing:-1.5px;display:block;line-height:1}
+.height span{font-size:13px;color:var(--muted)}
+
+.verdict{text-align:center;font-size:18px;font-weight:600}
+.verdict.ok{color:var(--good)} .verdict.no{color:var(--bad)}
+
+.final{text-align:center}
+.final b{display:block;font-size:clamp(34px,11vw,50px);font-weight:600;letter-spacing:-1px}
+.final span{display:block;color:var(--muted);font-size:14px;margin-top:6px}
+.badge{display:inline-block;margin-top:10px;padding:6px 13px;border-radius:99px;
+  background:rgba(110,231,183,.14);color:var(--good);font-size:13px;font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- ======================= START ======================= -->
+<section class="screen on" id="s-home">
+  <div class="center" style="justify-content:flex-start">
+    <div>
+      <div class="wordmark serif"><i>Mont</i><b>opia</b></div>
+      <div class="tagline">Ein Spieleabend für Monty &amp; Pia</div>
+    </div>
+
+    <div class="tiles">
+      <button class="tile" data-go="schaetz-modes">
+        <span class="ic">🎯</span>
+        <span class="tx"><b>Schätzchen</b><span>Schätz-Duell in 5 Spielarten · gegeneinander</span></span>
+        <span class="ar">›</span>
+      </button>
+      <button class="tile" data-go="erklaer-intro">
+        <span class="ic">⏱️</span>
+        <span class="tx"><b>Monty erklärt's</b><span>Begriffe gegen die Uhr · zusammen</span></span>
+        <span class="ar">›</span>
+      </button>
+      <button class="tile" data-go="knoten-start">
+        <span class="ic">🧶</span>
+        <span class="tx"><b>Pias Knoten</b><span>16 Wörter, 4 geheime Gruppen · zusammen</span></span>
+        <span class="ar">›</span>
+      </button>
+      <button class="tile" data-go="turm-start">
+        <span class="ic">🧱</span>
+        <span class="tx"><b>Montys Turm</b><span>Wahr oder falsch · zusammen</span></span>
+        <span class="ar">›</span>
+      </button>
+    </div>
+
+    <div class="scoreboard">
+      <div class="sb m"><span>Monty</span><b id="sc-m">0</b></div>
+      <div class="sb p"><span>Pia</span><b id="sc-p">0</b></div>
+    </div>
+  </div>
+  <div class="bottom">
+    <button class="btn ghost" id="newNight">Neuer Abend · Punkte zurücksetzen</button>
+  </div>
+</section>
+
+<!-- ======================= SCHÄTZCHEN: MODI ======================= -->
+<section class="screen" id="s-schaetz-modes">
+  <div class="topbar"><button class="back" data-go="home">‹</button><h2>Schätzchen</h2></div>
+  <div class="center" style="justify-content:flex-start">
+    <div class="hintline">Sechs Fragen pro Runde. Ein Handy – ihr gebt eure Tipps nacheinander ab, ohne zu spicken.</div>
+    <div class="tiles" id="modeList"></div>
+  </div>
+</section>
+
+<!-- ======================= SCHÄTZCHEN: SPIEL ======================= -->
+<section class="screen" id="s-schaetz">
+  <div class="topbar">
+    <button class="back" data-go="home">‹</button>
+    <h2 id="sg-title">Schätzchen</h2>
+    <span class="step" id="sg-step"></span>
+  </div>
+  <div class="center" id="sg-body"></div>
+  <div class="bottom" id="sg-foot"></div>
+</section>
+
+<!-- ======================= ERKLÄREN ======================= -->
+<section class="screen" id="s-erklaer-intro">
+  <div class="topbar"><button class="back" data-go="home">‹</button><h2>Monty erklärt's</h2></div>
+  <div class="center">
+    <div class="question">Zwei Runden à 60 Sekunden.</div>
+    <div class="hintline">
+      Erst erklärt Monty, dann Pia. Wer erklärt, hält das Handy – die andere Person rät.<br><br>
+      Der Begriff selbst, Teile davon und Übersetzungen sind tabu. Reimen gilt nicht.
+    </div>
+    <div class="hintline" id="erk-best"></div>
+  </div>
+  <div class="bottom">
+    <button class="btn monty big" id="erk-start">Monty beginnt</button>
+  </div>
+</section>
+
+<section class="screen" id="s-erklaer">
+  <div class="topbar">
+    <button class="back" data-go="home">‹</button>
+    <h2 id="erk-who">Monty erklärt</h2>
+    <span class="step" id="erk-round"></span>
+  </div>
+  <div class="center">
+    <div class="timer" id="erk-timer">60</div>
+    <div class="word" id="erk-word">–</div>
+    <div class="tally"><span>Richtig <b id="erk-hit">0</b></span><span>Übersprungen <b id="erk-skip">0</b></span></div>
+  </div>
+  <div class="bottom">
+    <button class="btn ghost" id="erk-pass">Weiter</button>
+    <button class="btn primary" id="erk-hitBtn">Richtig</button>
+  </div>
+</section>
+
+<section class="screen" id="s-erklaer-end">
+  <div class="topbar"><button class="back" data-go="home">‹</button><h2>Ergebnis</h2></div>
+  <div class="center">
+    <div class="final" id="erk-final"></div>
+  </div>
+  <div class="bottom">
+    <button class="btn primary" id="erk-again">Noch eine Runde</button>
+    <button class="btn ghost" data-go="home">Zurück zur Übersicht</button>
+  </div>
+</section>
+
+<!-- ======================= KNOTEN ======================= -->
+<section class="screen" id="s-knoten">
+  <div class="topbar">
+    <button class="back" data-go="home">‹</button>
+    <h2 id="kn-title">Pias Knoten</h2>
+    <span class="step" id="kn-step"></span>
+  </div>
+  <div class="center" style="justify-content:flex-start;gap:14px">
+    <div class="hintline" id="kn-hint">Findet vier Gruppen mit je vier Wörtern.</div>
+    <div class="solved" id="kn-solved"></div>
+    <div class="grid4" id="kn-grid"></div>
+    <div class="lives" id="kn-lives"></div>
+  </div>
+  <div class="bottom">
+    <button class="btn ghost" id="kn-clear">Auswahl leeren</button>
+    <button class="btn primary" id="kn-check" disabled>Prüfen</button>
+  </div>
+</section>
+
+<section class="screen" id="s-knoten-end">
+  <div class="topbar"><button class="back" data-go="home">‹</button><h2>Pias Knoten</h2></div>
+  <div class="center">
+    <div class="final" id="kn-final"></div>
+    <div class="solved" id="kn-reveal"></div>
+  </div>
+  <div class="bottom">
+    <button class="btn primary" id="kn-next">Nächstes Rätsel</button>
+    <button class="btn ghost" data-go="home">Zurück zur Übersicht</button>
+  </div>
+</section>
+
+<!-- ======================= TURM ======================= -->
+<section class="screen" id="s-turm">
+  <div class="topbar">
+    <button class="back" data-go="home">‹</button>
+    <h2>Montys Turm</h2>
+    <span class="step" id="tu-lives"></span>
+  </div>
+  <div class="center">
+    <div class="height"><b id="tu-h">0</b><span>Steine hoch</span></div>
+    <div class="tower" id="tu-tower"></div>
+    <div class="question" id="tu-stmt" style="text-align:center">–</div>
+    <div class="verdict" id="tu-verdict"></div>
+  </div>
+  <div class="bottom" id="tu-foot">
+    <div class="two">
+      <button class="btn pia" id="tu-true">Wahr</button>
+      <button class="btn monty" id="tu-false">Falsch</button>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="s-turm-end">
+  <div class="topbar"><button class="back" data-go="home">‹</button><h2>Montys Turm</h2></div>
+  <div class="center"><div class="final" id="tu-final"></div></div>
+  <div class="bottom">
+    <button class="btn primary" id="tu-again">Neuer Turm</button>
+    <button class="btn ghost" data-go="home">Zurück zur Übersicht</button>
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   DATEN
+   ============================================================ */
+
+/* [Frage, Kurzlabel, Wert, Einheit, Kategorie] */
+const FACTS = [
+["Wie hoch ist der Eiffelturm (mit Antenne)?","Eiffelturm",330,"m","Bauwerke"],
+["Wie hoch ist der Kölner Dom?","Kölner Dom",157,"m","Bauwerke"],
+["Wie hoch ist das Ulmer Münster, der höchste Kirchturm der Welt?","Ulmer Münster",162,"m","Bauwerke"],
+["Wie hoch ist der Burj Khalifa in Dubai?","Burj Khalifa",828,"m","Bauwerke"],
+["Wie hoch ist der Berliner Fernsehturm?","Berliner Fernsehturm",368,"m","Bauwerke"],
+["Wie hoch ist der Schiefe Turm von Pisa?","Schiefer Turm von Pisa",56,"m","Bauwerke"],
+["Wie hoch ist das Empire State Building bis zum Dach?","Empire State Building",381,"m","Bauwerke"],
+["Wie hoch ist die Freiheitsstatue inklusive Sockel?","Freiheitsstatue",93,"m","Bauwerke"],
+["Wie hoch ist die Cheops-Pyramide heute?","Cheops-Pyramide",139,"m","Bauwerke"],
+["Wie hoch ist das Brandenburger Tor?","Brandenburger Tor",26,"m","Bauwerke"],
+["Wie hoch ist die Christusstatue von Rio ohne Sockel?","Christusstatue in Rio",30,"m","Bauwerke"],
+["Wie hoch ist der Elizabeth Tower mit dem Big Ben?","Big Ben",96,"m","Bauwerke"],
+["Wie hoch sind die Türme der Münchner Frauenkirche?","Frauenkirche München",99,"m","Bauwerke"],
+["Wie hoch sind die Pylone der Golden Gate Bridge?","Golden Gate Bridge",227,"m","Bauwerke"],
+["Wie hoch ist die Zugspitze?","Zugspitze",2962,"m","Natur"],
+["Wie hoch ist der Mount Everest?","Mount Everest",8849,"m","Natur"],
+["Wie tief ist der Marianengraben an der tiefsten Stelle?","Marianengraben",11000,"m","Natur"],
+["Wie hoch ist der Salto Ángel, der höchste Wasserfall der Erde?","Salto Ángel",979,"m","Natur"],
+["Wie hoch ist der Brocken im Harz?","Brocken",1141,"m","Natur"],
+["Wie lang ist ein Marathon in Metern?","Marathon",42195,"m","Sport"],
+
+["Wie lang ist der Rhein insgesamt?","Rhein",1233,"km","Geografie"],
+["Wie lang ist die Donau?","Donau",2857,"km","Geografie"],
+["Wie lang ist der Nil?","Nil",6650,"km","Geografie"],
+["Wie lang ist die Elbe?","Elbe",1094,"km","Geografie"],
+["Wie groß ist der Erdumfang am Äquator?","Erdumfang",40075,"km","Geografie"],
+["Wie weit ist der Mond im Mittel von der Erde entfernt?","Erde–Mond",384400,"km","Weltall"],
+["Wie lang sind alle Abschnitte der Chinesischen Mauer zusammen?","Chinesische Mauer",21000,"km","Geografie"],
+["Wie lang ist das Große Barriereriff?","Großes Barriereriff",2300,"km","Natur"],
+["Wie lang ist die A7, die längste deutsche Autobahn?","Autobahn A7",963,"km","Geografie"],
+["Wie lang ist die Tour de France ungefähr insgesamt?","Tour de France",3400,"km","Sport"],
+["Wie weit fliegen Bienen zusammen für ein Kilogramm Honig?","Bienenflug für 1 kg Honig",120000,"km","Tiere"],
+["Wie lang sind alle Blutgefäße eines Menschen zusammen?","Blutgefäße eines Menschen",100000,"km","Körper"],
+
+["Wie weit ist die Sonne von der Erde entfernt?","Erde–Sonne",150,"Mio. km","Weltall"],
+["Wie lange braucht das Sonnenlicht bis zur Erde?","Sonnenlicht zur Erde",8,"Minuten","Weltall"],
+["Wie lang ist der Film Titanic?","Film Titanic",194,"Minuten","Kultur"],
+["Wie lange dauert ein Eishockeydrittel?","Eishockeydrittel",20,"Minuten","Sport"],
+["Wie viele Tage braucht der Mond für eine Erdumrundung?","Mondumlauf",27.3,"Tage","Weltall"],
+["Wie viele Erdtage dauert ein Jahr auf dem Merkur?","Jahr auf dem Merkur",88,"Tage","Weltall"],
+
+["Wie schnell ist ein Gepard im Sprint höchstens?","Gepard",110,"km/h","Tiere"],
+["Wie schnell wird ein Wanderfalke im Sturzflug?","Wanderfalke",320,"km/h","Tiere"],
+["Wie schnell ist Schall in Luft?","Schall in Luft",343,"m/s","Natur"],
+["Wie schnell ist Licht im Vakuum?","Lichtgeschwindigkeit",300000,"km/s","Weltall"],
+
+["Wie lang wird ein Blauwal?","Blauwal",30,"m","Tiere"],
+["Wie hoch wird eine ausgewachsene Giraffe?","Giraffe",5.5,"m","Tiere"],
+["Wie lang ist ein Fußballfeld nach Norm?","Fußballfeld",105,"m","Sport"],
+["Wie hoch hängt ein Basketballkorb?","Basketballkorb",3.05,"m","Sport"],
+
+["Wie schwer wird ein afrikanischer Elefantenbulle?","Elefantenbulle",6000,"kg","Tiere"],
+["Wie schwer wird ein ausgewachsener Eisbär?","Eisbär",450,"kg","Tiere"],
+
+["Wie schwer ist ein Straußenei?","Straußenei",1400,"g","Tiere"],
+["Wie schwer ist ein menschliches Gehirn?","Menschliches Gehirn",1400,"g","Körper"],
+["Wie schwer ist ein Fußball nach Norm?","Fußball",430,"g","Sport"],
+["Wie schwer ist eine klassische Tafel Schokolade?","Tafel Schokolade",100,"g","Essen"],
+
+["Wie viele Stunden schläft ein Koala pro Tag?","Schlaf eines Koalas",20,"Stunden","Tiere"],
+["Wie viele Stunden schläft eine Giraffe pro Tag?","Schlaf einer Giraffe",2,"Stunden","Tiere"],
+
+["Wie oft schlägt ein Kolibri pro Sekunde mit den Flügeln?","Kolibri-Flügelschläge",50,"mal","Tiere"],
+["Wie viele Herzen hat ein Oktopus?","Herzen eines Oktopus",3,"Stück","Tiere"],
+["Wie viele Halswirbel hat eine Giraffe?","Halswirbel einer Giraffe",7,"Stück","Tiere"],
+["Wie viele Eier legt ein Huhn ungefähr pro Jahr?","Eier pro Huhn und Jahr",300,"Stück","Tiere"],
+
+["Wie viele Knochen hat ein erwachsener Mensch?","Knochen eines Erwachsenen",206,"Stück","Körper"],
+["Wie viele Knochen hat ein Neugeborenes ungefähr?","Knochen eines Neugeborenen",300,"Stück","Körper"],
+["Wie viele Zähne hat ein Erwachsener mit Weisheitszähnen?","Zähne eines Erwachsenen",32,"Stück","Körper"],
+["Wie oft schlägt ein Herz ungefähr pro Tag?","Herzschläge pro Tag",100000,"mal","Körper"],
+["Wie viele Atemzüge macht ein Mensch ungefähr pro Tag?","Atemzüge pro Tag",20000,"mal","Körper"],
+["Wie viele Haare hat ein Mensch ungefähr auf dem Kopf?","Kopfhaare",100000,"Stück","Körper"],
+["Wie viel Blut hat ein erwachsener Mensch ungefähr?","Blut im Körper",5.5,"Liter","Körper"],
+["Wie hoch ist die normale Körpertemperatur?","Körpertemperatur",37,"°C","Körper"],
+["Wie hoch ist der Ruhepuls eines Erwachsenen im Schnitt?","Ruhepuls",70,"Schläge/Min.","Körper"],
+
+["Wie viele Kalorien stecken in 100 Gramm Butter?","100 g Butter",740,"kcal","Essen"],
+["Wie viele Kalorien stecken in 100 Gramm Gurke?","100 g Gurke",12,"kcal","Essen"],
+["Wie hoch ist der Wasseranteil einer Gurke?","Wasseranteil Gurke",96,"%","Essen"],
+["Wie viel Zucker steckt in einer 0,33-Liter-Dose Cola?","Zucker in einer Dose Cola",35,"g","Essen"],
+["Wie viel Kaffee trinken die Deutschen pro Kopf und Jahr?","Kaffee pro Kopf",165,"Liter","Essen"],
+["Wie viel Bier trinken die Deutschen pro Kopf und Jahr?","Bier pro Kopf",90,"Liter","Essen"],
+["Wie viele Brotsorten sind in Deutschland registriert?","Deutsche Brotsorten",3200,"Stück","Essen"],
+["Wie scharf ist eine Habanero in Scoville?","Habanero",200000,"Scoville","Essen"],
+["Wie scharf ist eine Jalapeño in Scoville?","Jalapeño",5000,"Scoville","Essen"],
+["Wie heiß ist ein neapolitanischer Pizzaofen?","Pizzaofen",450,"°C","Essen"],
+
+["Wie heiß ist die Oberfläche der Sonne?","Sonnenoberfläche",5500,"°C","Weltall"],
+["Wie heiß wird ein Blitz?","Blitz",30000,"°C","Natur"],
+["Bei wie viel Grad kocht Wasser auf der Zugspitze?","Wasser auf der Zugspitze",90,"°C","Natur"],
+
+["Wie viele Mitgliedsstaaten hat die UNO?","UNO-Mitgliedsstaaten",193,"Stück","Geografie"],
+["Wie viele Bundesländer hat Deutschland?","Bundesländer",16,"Stück","Geografie"],
+["Wie viele Bundesstaaten hat die USA?","US-Bundesstaaten",50,"Stück","Geografie"],
+["Wie viele Sterne hat die Europaflagge?","Sterne auf der Europaflagge",12,"Stück","Geografie"],
+["Wie viele Planeten hat unser Sonnensystem?","Planeten im Sonnensystem",8,"Stück","Weltall"],
+["Wie viele Menschen leben in Deutschland?","Einwohner Deutschlands",84,"Mio.","Geografie"],
+["Wie groß ist Deutschland?","Fläche Deutschlands",357600,"km²","Geografie"],
+["Wie groß ist die Vatikanstadt?","Fläche der Vatikanstadt",0.44,"km²","Geografie"],
+
+["Wie viele Tasten hat ein Klavier?","Klaviertasten",88,"Stück","Kultur"],
+["Wie viele Saiten hat eine Geige?","Saiten einer Geige",4,"Stück","Kultur"],
+["Wie viele Oscars gewann der Film Titanic?","Oscars für Titanic",11,"Stück","Kultur"],
+["Wie viele Studioalben haben die Beatles veröffentlicht?","Beatles-Studioalben",13,"Stück","Kultur"],
+["Wie viele Folgen hat die Serie Friends?","Folgen von Friends",236,"Stück","Kultur"],
+["Wie viele Harry-Potter-Bände gibt es?","Harry-Potter-Bände",7,"Stück","Kultur"],
+["Wie lang ist Bohemian Rhapsody in Sekunden?","Bohemian Rhapsody",355,"Sekunden","Kultur"],
+["Wie viele Felder hat ein Schachbrett?","Felder eines Schachbretts",64,"Stück","Kultur"],
+["Wie viele Karten hat ein Skatblatt?","Karten eines Skatblatts",32,"Stück","Kultur"],
+["Wie viele Steine hat ein Doppel-Sechs-Dominospiel?","Dominosteine",28,"Stück","Kultur"],
+["Wie viele Buchstaben hat das deutsche Alphabet ohne Umlaute und ß?","Deutsches Alphabet",26,"Stück","Kultur"],
+["Wie viele Löcher hat ein normaler Golfplatz?","Löcher eines Golfplatzes",18,"Stück","Sport"],
+["Wie viele olympische Ringe gibt es?","Olympische Ringe",5,"Stück","Sport"],
+["Wie viele Noppen hat ein klassischer 2×4-Legostein?","Noppen eines Legosteins",8,"Stück","Kultur"]
+].map(a => ({q:a[0], l:a[1], v:a[2], u:a[3], c:a[4]}));
+
+/* [Aussage, 1=wahr, Erklärung] */
+const WF = [
+["Ein Oktopus hat drei Herzen.",1,"Zwei Kiemenherzen und ein Hauptherz."],
+["Die Chinesische Mauer ist mit bloßem Auge vom Mond aus zu sehen.",0,"Dafür ist sie viel zu schmal."],
+["Bananen sind botanisch gesehen Beeren.",1,"Erdbeeren dagegen nicht."],
+["Erdbeeren sind botanisch gesehen Beeren.",0,"Sie sind Sammelnussfrüchte."],
+["Fledermäuse sind blind.",0,"Sie sehen – und orientieren sich zusätzlich per Echo."],
+["Honig kann praktisch nicht verderben.",1,"In ägyptischen Gräbern fand man essbaren Honig."],
+["Goldfische haben nur drei Sekunden Gedächtnis.",0,"Sie merken sich Dinge über Monate."],
+["Napoleon war für seine Zeit ungewöhnlich klein.",0,"Mit rund 1,68 m war er völlig durchschnittlich."],
+["Im Weltall kann man keinen Schall hören.",1,"Ohne Luft gibt es nichts, was Schall überträgt."],
+["Die Zunge hat feste Zonen für süß, sauer, salzig und bitter.",0,"Ein hartnäckiger Schulbuchmythos."],
+["Ein Blitz schlägt nie zweimal an derselben Stelle ein.",0,"Hohe Gebäude trifft es regelmäßig mehrfach."],
+["Wir nutzen nur zehn Prozent unseres Gehirns.",0,"Über den Tag ist praktisch das ganze Gehirn aktiv."],
+["Kamele speichern Wasser in ihren Höckern.",0,"In den Höckern steckt Fett."],
+["Es gibt mehr Bäume auf der Erde als Sterne in unserer Milchstraße.",1,"Rund drei Billionen Bäume."],
+["Ein Tag auf der Venus dauert länger als ein Venusjahr.",1,"Die Venus dreht sich extrem langsam."],
+["Spinnen sind Insekten.",0,"Sie sind Spinnentiere – acht Beine statt sechs."],
+["Tomaten sind botanisch Früchte.",1,"Genauer: Beeren."],
+["Australien ist breiter als der Monddurchmesser.",1,"Rund 4.000 km gegenüber 3.474 km."],
+["Eisbären haben schwarze Haut.",1,"Das Fell ist durchscheinend, nicht weiß."],
+["Flamingos kommen rosa zur Welt.",0,"Die Farbe kommt später übers Futter."],
+["Kolibris können rückwärts fliegen.",1,"Als einzige Vögel überhaupt."],
+["Pinguine leben am Nordpol.",0,"Fast alle leben auf der Südhalbkugel."],
+["Der Große Rote Fleck auf dem Jupiter ist ein Sturm.",1,"Er tobt seit Jahrhunderten."],
+["Es gibt mehr mögliche Schachpartien als Atome im beobachtbaren Universum.",1,"Die Zahl ist absurd groß."],
+["Eulen können ihren Kopf um volle 360 Grad drehen.",0,"Etwa 270 Grad sind das Maximum."],
+["Menschen und Bananen teilen rund die Hälfte ihrer Gene.",1,"Grundlegende Zellfunktionen sind sehr alt."],
+["Blattgold ist essbar.",1,"Es ist als Lebensmittelzusatz zugelassen."],
+["Der Eiffelturm ist im Sommer höher als im Winter.",1,"Wärme dehnt das Eisen um bis zu 15 cm."],
+["Nutella wurde in Deutschland erfunden.",0,"Die Nuss-Nougat-Creme stammt aus Italien."],
+["Die Currywurst wurde in Berlin erfunden.",1,"1949 von Herta Heuwer."],
+["Das Oktoberfest beginnt im September.",1,"Es endet traditionell am ersten Oktoberwochenende."],
+["Berlin hat mehr Brücken als Venedig.",1,"Rund 900 gegenüber etwa 400."],
+["Nordsee und Ostsee haben denselben Salzgehalt.",0,"Die Ostsee ist deutlich salzärmer."],
+["Katzen können süß nicht schmecken.",1,"Ihnen fehlt der passende Rezeptor."],
+["Hunde sehen nur schwarz-weiß.",0,"Sie sehen Farben, nur weniger als wir."],
+["Zucker macht Kinder nachweislich hyperaktiv.",0,"Studien finden diesen Effekt nicht."],
+["Ein Blitz ist heißer als die Sonnenoberfläche.",1,"Rund 30.000 statt 5.500 Grad."],
+["Reines, destilliertes Wasser leitet kaum Strom.",1,"Erst gelöste Salze machen es leitfähig."],
+["Die Cheops-Pyramide war über 3.000 Jahre das höchste Bauwerk der Welt.",1,"Bis mittelalterliche Kathedralen sie übertrafen."],
+["Kleopatra lebte zeitlich näher an der Mondlandung als am Bau der Cheops-Pyramide.",1,"Die Pyramide war zu ihren Lebzeiten schon uralt."],
+["Haie gab es schon vor den ersten Bäumen.",1,"Sie sind über 400 Millionen Jahre alt."],
+["Die Erde ist eine perfekte Kugel.",0,"Sie ist am Äquator etwas dicker."],
+["Auf dem Mond gibt es keine Schwerkraft.",0,"Sie beträgt etwa ein Sechstel der irdischen."],
+["Der Saturn würde in einem großen Wasserbecken schwimmen.",1,"Seine Dichte ist geringer als die von Wasser."],
+["Ein Lichtjahr ist eine Zeiteinheit.",0,"Es ist eine Entfernung."],
+["Vampirfledermäuse, die Blut trinken, gibt es wirklich.",1,"Drei Arten in Mittel- und Südamerika."],
+["Giraffen haben mehr Halswirbel als Menschen.",0,"Beide haben sieben – die der Giraffe sind länger."],
+["Bei Seepferdchen trägt das Männchen den Nachwuchs aus.",1,"In einer Bruttasche am Bauch."],
+["Delfine schlafen immer nur mit einer Gehirnhälfte.",1,"Die andere hält sie am Atmen."],
+["Elefanten können nicht springen.",0,"Richtig – sie können es tatsächlich nicht."],
+["Kängurus können nicht rückwärts gehen.",1,"Schwanz und Beinbau lassen es nicht zu."],
+["Waschbären waschen ihr Futter.",0,"Sie betasten es im Wasser, um es zu erfühlen."],
+["Die Farbe Orange wurde nach der Frucht benannt.",1,"Vorher sagte man im Deutschen gelbrot."],
+["Ketchup wurde früher als Medizin verkauft.",1,"In den 1830er Jahren sogar als Pille."],
+["Die Mikrowelle wurde durch Zufall entdeckt.",1,"Ein Schokoriegel schmolz in der Tasche eines Ingenieurs."],
+["Post-its entstanden aus einem misslungenen Klebstoff.",1,"Der Kleber hielt zu schlecht – und war damit perfekt."],
+["Champagner darf nur aus der Champagne kommen.",1,"Sonst heißt es schlicht Schaumwein."],
+["Weiße Schokolade enthält überhaupt keinen Kakao.",0,"Sie enthält Kakaobutter, aber keine Kakaomasse."],
+["Erdnüsse sind Nüsse.",0,"Sie sind Hülsenfrüchte, verwandt mit Erbsen."],
+["Der Wasabi in europäischen Restaurants ist meist kein echter Wasabi.",1,"Meist Meerrettich mit Farbstoff."],
+["Karotten verbessern die Nachtsicht deutlich.",0,"Das war britische Kriegspropaganda."],
+["Spinat enthält außergewöhnlich viel Eisen.",0,"Der Mythos geht auf einen Kommafehler zurück."],
+["Nach dem Essen soll man 30 Minuten mit dem Schwimmen warten.",0,"Dafür gibt es keine Belege."],
+["Der Mensch verliert den Großteil seiner Wärme über den Kopf.",0,"Es ist ungefähr proportional zur Fläche."],
+["Rasieren lässt Haare dicker nachwachsen.",0,"Sie wirken nur stoppeliger."],
+["Verschlucktes Kaugummi bleibt sieben Jahre im Magen.",0,"Es wird ganz normal ausgeschieden."],
+["Fingerknacken führt zu Arthrose.",0,"Studien zeigen keinen Zusammenhang."],
+["Der Daumen hat nur zwei Glieder.",1,"Alle anderen Finger haben drei."],
+["Eineiige Zwillinge haben identische Fingerabdrücke.",0,"Die entstehen erst im Mutterleib durch Zufall."],
+["Die Zunge ist der stärkste Muskel des Körpers.",0,"Je nach Maßstab sind es Kiefer- oder Gesäßmuskel."],
+["Man kann sich selbst nicht kitzeln.",1,"Das Gehirn rechnet die eigene Bewegung heraus."],
+["Niesen mit offenen Augen ist unmöglich.",0,"Ungewöhnlich, aber machbar."],
+["Babys haben mehr Knochen als Erwachsene.",1,"Rund 300 – viele wachsen später zusammen."],
+["Blut ist in den Venen blau.",0,"Es ist immer rot, nur dunkler."],
+["Das menschliche Auge kann rund eine Million Farbtöne unterscheiden.",1,"Manche Menschen sogar deutlich mehr."],
+["Der Blinddarmfortsatz hat überhaupt keine Funktion.",0,"Er beherbergt nützliche Darmbakterien."],
+["Schnecken können mehrere Jahre am Stück ruhen.",1,"In Trockenstarre bis zu drei Jahre."],
+["Schwäne bleiben meist ihr Leben lang beim selben Partner.",1,"Trennungen sind die Ausnahme."],
+["Es schneit auf dem Mars.",1,"Allerdings Trockeneis aus Kohlendioxid."],
+["Die Sonne ist eigentlich weiß, nicht gelb.",1,"Gelb wirkt sie nur durch die Atmosphäre."],
+["Der Mount Everest ist vom Fuß bis zum Gipfel der höchste Berg der Erde.",0,"Vom Meeresboden gemessen ist der Mauna Kea höher."],
+["Russland hat eine größere Fläche als der Zwergplanet Pluto.",1,"17,1 gegenüber 16,7 Millionen Quadratkilometern."],
+["E ist der häufigste Buchstabe in deutschen Texten.",1,"Mit großem Abstand."],
+["Das Herz eines Blauwals ist etwa so groß wie ein Kleinwagen.",1,"Und wiegt mehrere hundert Kilo."],
+["In Deutschland gibt es mehr als 5.000 Biersorten.",1,"Über 1.500 Brauereien stellen sie her."],
+["Die Venus dreht sich andersherum als die meisten Planeten.",1,"Dort geht die Sonne im Westen auf."],
+["Ein menschliches Niesen erreicht über 50 km/h.",1,"Schätzungen reichen deutlich höher."],
+["Stiere sehen rot und werden davon wütend.",0,"Rinder sind rotblind – es ist die Bewegung."],
+["Lemminge stürzen sich in Massen von Klippen.",0,"Eine für einen Film inszenierte Legende."],
+["Das Chamäleon wechselt die Farbe vor allem zur Tarnung.",0,"Meist geht es um Temperatur und Stimmung."],
+["Strauße stecken bei Gefahr den Kopf in den Sand.",0,"Sie legen ihn flach auf den Boden."],
+["Die meisten Menschen im Weltraum waren US-Amerikaner.",1,"Mit deutlichem Abstand vor Russland."],
+["Es gibt mehr Hühner als Menschen auf der Erde.",1,"Mehr als dreimal so viele."],
+["Island hat keine Mücken.",1,"Eine der wenigen Regionen weltweit ohne."],
+["Der Buchstabe W existiert im italienischen Alphabet nicht.",1,"Er kommt nur in Fremdwörtern vor."],
+["Ein Jahr auf dem Jupiter dauert etwa zwölf Erdjahre.",1,"11,86 Jahre genau."],
+["Wale sind Fische.",0,"Sie sind Säugetiere."],
+["Der höchste Punkt Deutschlands liegt in Bayern.",1,"Die Zugspitze."]
+].map(a => ({s:a[0], w:!!a[1], e:a[2]}));
+
+const TERMS = [
+"Regenschirm","Staubsauger","Zahnbürste","Wäscheleine","Kühlschrank","Spülmaschine","Bügeleisen","Schlüsselbund",
+"Fernbedienung","Haartrockner","Taschenlampe","Kerzenständer","Fußmatte","Briefkasten","Nachttisch","Duschvorhang",
+"Mülltonne","Gartenzwerg","Schaukelstuhl","Wecker","Lupe","Werkzeugkasten","Kleiderbügel","Heizkörper","Rasenmäher",
+"Spiegelei","Lasagne","Gurkensalat","Kaugummi","Senf","Tiefkühlpizza","Zuckerwatte","Weißwein","Grillkohle",
+"Marmeladenglas","Pfannkuchen","Eiswürfel","Bratwurst","Müsliriegel","Spätzle","Kaffeefilter","Salzstreuer",
+"Käsefondue","Gummibärchen","Popcorn",
+"Igel","Faultier","Flamingo","Eichhörnchen","Nilpferd","Seepferdchen","Marienkäfer","Waschbär","Pinguin",
+"Chamäleon","Regenwurm","Fledermaus","Erdmännchen","Papagei","Schnabeltier","Qualle","Dackel","Libelle",
+"Alpaka","Wildschwein",
+"Leuchtturm","Bahnhof","Baumhaus","Schwimmbad","Flughafen","Bibliothek","Zeltplatz","Friseursalon","Skipiste",
+"Museum","Autowaschanlage","Gewächshaus","Tankstelle","Burgruine","Eisdiele","Zoo","Kirchturm","Parkhaus",
+"Weinberg","Kletterhalle",
+"Schornsteinfeger","Hebamme","Tierarzt","Bademeister","Imker","Feuerwehrmann","Pilot","Bäcker","Förster",
+"Schauspieler","Dachdecker","Winzer","Standesbeamter","Zahnarzt","Müllabfuhr","Gärtner","Fluglotse","Barkeeper",
+"Oscarverleihung","Schlagzeug","Mundharmonika","Karaoke","Liebesfilm","Abspann","Dirigent","Ballett","Comicheft",
+"Hörspiel","Zauberwürfel","Konfetti","Lagerfeuerlied","Drehbuch","Zirkus","Puppentheater","Tätowierung","Weihnachtsmarkt",
+"Heimweh","Fernweh","Schadenfreude","Geduld","Aberglaube","Zeitdruck","Eifersucht","Gemütlichkeit","Vorfreude",
+"Déjà-vu","Langeweile","Höhenangst","Neugier","Entschuldigung","Überraschung","Versprechen","Kompromiss","Lampenfieber",
+"Ladekabel","Suchmaschine","Passwort","Drohne","Sprachnachricht","Bildschirmschoner","Navigationsgerät","Akkustand",
+"Tastatur","Videokonferenz","Spam-Mail","Kopfhörer","Steckdose","Powerbank","Update","Strichcode",
+"Trampolin","Schiedsrichter","Kegelbahn","Fallschirmsprung","Yogamatte","Stadionwelle","Angelrute","Schlittschuh",
+"Tauchen","Hula-Hoop","Boxhandschuh","Wanderstock","Tischtennis","Bergsteigen",
+"Regenbogen","Gewitter","Sanddüne","Schneeflocke","Vollmond","Nebelbank","Herbstlaub","Wasserfall",
+"Sonnenfinsternis","Gänseblümchen","Lawine","Pusteblume","Sternschnuppe","Eiszapfen"
+];
+
+/* Jede Gruppe: [Überschrift, 4 Wörter] */
+const KNOTEN = [
+{t:"Guten Morgen", g:[
+  ["Aufs Brot","Marmelade","Honig","Nutella","Leberwurst"],
+  ["Aus der Kanne","Kaffee","Tee","Kakao","Milchkaffee"],
+  ["Aus dem Ei","Rührei","Spiegelei","Omelett","Pfannkuchen"],
+  ["Vom Bäcker","Brötchen","Croissant","Laugenstange","Hörnchen"]]},
+
+{t:"Ganz in Blau", g:[
+  ["Typisch blau","Himmel","Meer","Veilchen","Jeans"],
+  ["Musikrichtung","Blues","Jazz","Soul","Funk"],
+  ["Beerenart","Heidelbeere","Brombeere","Himbeere","Johannisbeere"],
+  ["Beginnt mit blau","Blaumachen","Blauäugig","Blaulicht","Blaupause"]]},
+
+{t:"Spielabend", g:[
+  ["Brettspiel","Monopoly","Risiko","Scrabble","Siedler"],
+  ["Kartenspiel","Skat","Doppelkopf","Mau-Mau","Canasta"],
+  ["Olympische Sportart","Judo","Rudern","Fechten","Turnen"],
+  ["Farbe im Blatt","Herz","Pik","Karo","Kreuz"]]},
+
+{t:"In der Küche", g:[
+  ["Schneidet","Messer","Hobel","Schere","Wiegemesser"],
+  ["Gewürz","Kümmel","Paprika","Muskat","Zimt"],
+  ["Garmethode","Braten","Dünsten","Schmoren","Blanchieren"],
+  ["Gefäß","Topf","Pfanne","Schüssel","Sieb"]]},
+
+{t:"Blick nach oben", g:[
+  ["Planet","Merkur","Venus","Mars","Saturn"],
+  ["Wetter","Regen","Nebel","Hagel","Wind"],
+  ["Vogel","Schwalbe","Adler","Möwe","Specht"],
+  ["Fliegt, ohne zu leben","Drachen","Ballon","Rakete","Segelflieger"]]},
+
+{t:"Kinoabend", g:[
+  ["Oscar-Kategorie","Hauptrolle","Regie","Drehbuch","Schnitt"],
+  ["Filmgenre","Western","Komödie","Thriller","Drama"],
+  ["Star Wars","Yoda","Leia","Chewbacca","Vader"],
+  ["Im Kinosaal","Popcorn","Leinwand","Trailer","Reihe"]]},
+
+{t:"Musikstunde", g:[
+  ["Hat Saiten","Gitarre","Harfe","Cello","Banjo"],
+  ["Steht in Noten","Pause","Takt","Schlüssel","Vorzeichen"],
+  ["Beatle","Lennon","McCartney","Harrison","Starr"],
+  ["Tanz","Walzer","Tango","Samba","Foxtrott"]]},
+
+{t:"Zu Hause", g:[
+  ["Raum","Flur","Küche","Bad","Keller"],
+  ["Teil einer Tür","Klinke","Schloss","Angel","Rahmen"],
+  ["Werkzeug","Hammer","Zange","Säge","Bohrer"],
+  ["Möbelstück","Sessel","Regal","Kommode","Hocker"]]},
+
+{t:"Alles im Fluss", g:[
+  ["Gewässer","See","Teich","Bach","Weiher"],
+  ["Lebt im Meer","Qualle","Hai","Rochen","Krake"],
+  ["Schwimmstil","Kraul","Brust","Rücken","Delfin"],
+  ["Im Badezimmer","Dusche","Wanne","Hahn","Brause"]]},
+
+{t:"Kofferpacken", g:[
+  ["Gepäckstück","Koffer","Rucksack","Tasche","Trolley"],
+  ["Hauptstadt","Lissabon","Oslo","Wien","Athen"],
+  ["Verkehrsmittel","Zug","Fähre","Bus","Flugzeug"],
+  ["Am Strand","Sand","Muschel","Liege","Schirm"]]},
+
+{t:"Bella Italia", g:[
+  ["Rotton","Bordeaux","Karmin","Scharlach","Purpur"],
+  ["Italienische Stadt","Mailand","Turin","Neapel","Florenz"],
+  ["Rebsorte","Riesling","Merlot","Chardonnay","Silvaner"],
+  ["Käsesorte","Gouda","Brie","Camembert","Feta"]]},
+
+{t:"Eine Frage der Zeit", g:[
+  ["Monat","März","Mai","Juli","August"],
+  ["Römischer Herrscher","Augustus","Julius","Claudius","Nero"],
+  ["Wochentag","Montag","Freitag","Sonntag","Mittwoch"],
+  ["Jahreszeit","Frühling","Sommer","Herbst","Winter"]]}
+];
+
+/* ============================================================
+   HILFSFUNKTIONEN
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const rnd = n => Math.floor(Math.random()*n);
+const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];} return a; };
+const fmt = n => n.toLocaleString('de-DE',{maximumFractionDigits:2});
+const fmtU = f => fmt(f.v)+' '+f.u;
+
+/* Rundet auf zwei signifikante Stellen – erzeugt plausible Falschantworten. */
+function roundNice(x){
+  if (x <= 0) return 0;
+  const mag = Math.pow(10, Math.floor(Math.log10(x)) - 1);
+  const r = Math.round(x/mag)*mag;
+  return mag < 1 ? Math.round(r*100)/100 : r;
+}
+
+function niceStep(span){
+  const raw = span/120;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const n = raw/mag;
+  const mult = n < 1.5 ? 1 : n < 3.5 ? 2 : n < 7.5 ? 5 : 10;
+  return +(mult*mag).toPrecision(2);
+}
+
+/* Bereich um den wahren Wert, dessen Position zufällig variiert. */
+function makeRange(v){
+  const span = v * (2.2 + Math.random()*1.8);
+  const pos  = 0.22 + Math.random()*0.56;
+  let lo = Math.max(0, v - span*pos);
+  let hi = lo + span;
+  let step = niceStep(hi-lo);
+  if (Number.isInteger(v)) step = Math.max(1, Math.round(step));
+  const dec = Math.max(0, Math.min(6, -Math.floor(Math.log10(step))));
+  return {
+    min: +(Math.floor(lo/step)*step).toFixed(dec),
+    max: +(Math.ceil(hi/step)*step).toFixed(dec),
+    step: step, dec: dec
+  };
+}
+
+/* Baut das Raster vom wahren Wert aus auf, damit er exakt treffbar bleibt (fürs Flunkern). */
+function alignRange(r, v){
+  const step = r.step;
+  let below = Math.max(1, Math.round((v - r.min)/step));
+  if (v - below*step < 0) below = Math.max(1, Math.floor(v/step));
+  const above = Math.max(1, Math.round((r.max - v)/step));
+  return {
+    min: +(v - below*step).toPrecision(12),
+    max: +(v + above*step).toPrecision(12),
+    step: step, dec: r.dec
+  };
+}
+
+function distractors(v){
+  const out = [];
+  for (const m of shuffle([0.3,0.45,0.6,0.78,1.3,1.7,2.2,3.0])){
+    const d = roundNice(v*m);
+    if (d > 0 && d !== v && !out.includes(d)) out.push(d);
+    if (out.length === 3) break;
+  }
+  let pad = 1;
+  while (out.length < 3){ const d = roundNice(v*(4+pad)); if(!out.includes(d)) out.push(d); pad++; }
+  return out;
+}
+
+/* ============================================================
+   ZUSTAND & NAVIGATION
+   ============================================================ */
+const KEY = 'montopia-v1';
+let S = {monty:0, pia:0, bestErk:0, bestTurm:0, knotenDone:[]};
+try { S = Object.assign(S, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch(e){}
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} };
+
+let timerId = null;
+function show(name){
+  if (timerId){ clearInterval(timerId); timerId = null; }
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  $('s-'+name).classList.add('on');
+  window.scrollTo(0,0);
+}
+function drawScore(){ $('sc-m').textContent = S.monty; $('sc-p').textContent = S.pia; }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-go]');
+  if (!t) return;
+  const go = t.dataset.go;
+  if (go === 'home'){ drawScore(); show('home'); }
+  else if (go === 'schaetz-modes'){ show('schaetz-modes'); }
+  else if (go === 'erklaer-intro'){ erkIntro(); }
+  else if (go === 'knoten-start'){ knStart(); }
+  else if (go === 'turm-start'){ tuStart(); }
+});
+
+$('newNight').onclick = () => {
+  if (!confirm('Punktestand von Monty und Pia zurücksetzen?')) return;
+  S.monty = 0; S.pia = 0; save(); drawScore();
+};
+
+/* ============================================================
+   SPIEL 1 — SCHÄTZCHEN
+   ============================================================ */
+const MODES = [
+  {id:'mc',     ic:'🔢', n:'Qual der Wahl',     d:'Vier Antworten, beide tippen heimlich'},
+  {id:'slider', ic:'🎚️', n:'Daumen mal Pia',    d:'Frei schätzen – wer näher dran ist, gewinnt'},
+  {id:'hilo',   ic:'↕️', n:'Rauf & Runter',     d:'Mehr oder weniger? Abwechselnd geraten'},
+  {id:'price',  ic:'🔥', n:'Heiß & Nah',        d:'Am nächsten dran, ohne drüber zu gehen'},
+  {id:'bluff',  ic:'🎭', n:"Montys Flunkerei",  d:'Einer behauptet, die andere glaubt – oder nicht'},
+  {id:'mix',    ic:'🎲', n:'Wilde Mischung',    d:'Alle fünf Spielarten bunt durcheinander'}
+];
+
+$('modeList').innerHTML = MODES.map(m =>
+  `<button class="tile" data-mode="${m.id}">
+     <span class="ic">${m.ic}</span>
+     <span class="tx"><b>${m.n}</b><span>${m.d}</span></span>
+     <span class="ar">›</span>
+   </button>`).join('');
+
+$('modeList').onclick = e => {
+  const t = e.target.closest('[data-mode]');
+  if (t) sgStart(t.dataset.mode);
+};
+
+const SG = {mode:null, qs:[], i:0, phase:0, m:0, p:0, a:{}, cur:null};
+
+function pickFacts(n){ return shuffle(FACTS.slice()).slice(0,n); }
+
+/* Paare mit gleicher Einheit und spürbarem, aber fairem Abstand. */
+function pickPairs(n){
+  const byUnit = {};
+  FACTS.forEach(f => (byUnit[f.u] = byUnit[f.u] || []).push(f));
+  const pool = [];
+  Object.values(byUnit).forEach(list => {
+    if (list.length < 2) return;
+    for (let i=0;i<list.length;i++) for (let j=i+1;j<list.length;j++){
+      const r = Math.max(list[i].v,list[j].v) / Math.min(list[i].v,list[j].v);
+      if (r > 1.15 && r < 40) pool.push([list[i], list[j]]);
+    }
+  });
+  return shuffle(pool).slice(0,n).map(p => shuffle(p.slice()));
+}
+
+function sgStart(mode){
+  SG.mode = mode; SG.i = 0; SG.m = 0; SG.p = 0;
+  SG.qs = [];
+  for (let k=0;k<6;k++){
+    const real = mode === 'mix' ? MODES[rnd(5)].id : mode;
+    SG.qs.push({mode:real});
+  }
+  const pairs = pickPairs(6);
+  const facts = pickFacts(12);
+  let pi = 0, fi = 0;
+  SG.qs.forEach(q => { q.mode === 'hilo' ? (q.pair = pairs[pi++] || pairs[0]) : (q.fact = facts[fi++]); });
+  $('sg-title').textContent = MODES.find(m => m.id === mode).n;
+  show('schaetz');
+  sgQuestion();
+}
+
+function sgQuestion(){
+  if (SG.i >= SG.qs.length) return sgEnd();
+  SG.cur = SG.qs[SG.i];
+  SG.a = {};
+  SG.phase = 0;
+  $('sg-step').textContent = (SG.i+1) + ' / ' + SG.qs.length;
+  /* Wer beginnt, wechselt pro Frage. */
+  SG.first = SG.i % 2 === 0 ? 'm' : 'p';
+  if (SG.cur.mode === 'hilo') sgHilo();
+  else if (SG.cur.mode === 'bluff') sgBluffPrompt();
+  else sgSecretPrompt(SG.first);
+}
+
+const NAME = {m:'Monty', p:'Pia'};
+const otherOf = w => w === 'm' ? 'p' : 'm';
+
+function sgSecretPrompt(who){
+  const f = SG.cur.fact;
+  $('sg-body').innerHTML =
+    `<div class="kicker ${who}">${NAME[who]} ist dran</div>
+     <div class="question">${NAME[otherOf(who)]}, bitte kurz wegschauen.</div>
+     <div class="hintline">${f.c}</div>`;
+  $('sg-foot').innerHTML = `<button class="btn ${who} big" id="sg-ready">Ich bin bereit</button>`;
+  $('sg-ready').onclick = () => sgInput(who);
+}
+
+function sgInput(who){
+  const f = SG.cur.fact;
+  const mode = SG.cur.mode;
+
+  if (mode === 'mc'){
+    if (!SG.cur.opts) SG.cur.opts = shuffle(distractors(f.v).concat([f.v]));
+    $('sg-body').innerHTML =
+      `<div class="kicker ${who}">${NAME[who]}</div>
+       <div class="question">${f.q}</div>
+       <div class="opts">${SG.cur.opts.map((o,k) =>
+         `<button class="opt" data-k="${k}">${fmt(o)} ${f.u}</button>`).join('')}</div>`;
+    $('sg-foot').innerHTML = '';
+    $('sg-body').querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      SG.a[who] = SG.cur.opts[+b.dataset.k];
+      sgAfterInput(who);
+    });
+    return;
+  }
+
+  /* slider + price */
+  if (!SG.cur.rng) SG.cur.rng = makeRange(f.v);
+  const r = SG.cur.rng;
+  const start = +( (r.min + (r.max-r.min)/2).toFixed(2) );
+  $('sg-body').innerHTML =
+    `<div class="kicker ${who}">${NAME[who]}</div>
+     <div class="question">${f.q}</div>
+     ${mode === 'price' ? '<div class="hintline">Nicht überschätzen – wer drüber liegt, ist raus.</div>' : ''}
+     <div class="readout"><b id="sg-val">${fmt(start)}</b><span>${f.u}</span></div>
+     <input type="range" id="sg-range" min="${r.min}" max="${r.max}" step="${r.step}" value="${start}">
+     <div class="range-ends"><span>${fmt(r.min)}</span><span>${fmt(r.max)}</span></div>`;
+  $('sg-foot').innerHTML = `<button class="btn ${who} big" id="sg-ok">Tipp abgeben</button>`;
+  const rg = $('sg-range');
+  rg.oninput = () => $('sg-val').textContent = fmt(+rg.value);
+  $('sg-ok').onclick = () => { SG.a[who] = +rg.value; sgAfterInput(who); };
+}
+
+function sgAfterInput(who){
+  const other = otherOf(who);
+  if (SG.a[other] === undefined) sgSecretPrompt(other);
+  else sgReveal();
+}
+
+function sgReveal(){
+  const f = SG.cur.fact, mode = SG.cur.mode;
+  const dm = Math.abs(SG.a.m - f.v), dp = Math.abs(SG.a.p - f.v);
+  let winner = null, note = '';
+
+  if (mode === 'mc'){
+    const okm = SG.a.m === f.v, okp = SG.a.p === f.v;
+    if (okm) SG.m += 2;
+    if (okp) SG.p += 2;
+    note = (!okm && !okp) ? 'Beide daneben.' : (okm && okp) ? 'Beide richtig!' : '';
+  } else if (mode === 'price'){
+    const om = SG.a.m > f.v, op = SG.a.p > f.v;
+    if (om && op) note = 'Beide drüber – kein Punkt.';
+    else if (om) winner = 'p';
+    else if (op) winner = 'm';
+    else winner = dm < dp ? 'm' : dp < dm ? 'p' : null;
+    if (winner) { SG[winner] += 2; }
+    else if (!om && !op) { SG.m++; SG.p++; note = 'Exakt gleich nah.'; }
+  } else {
+    winner = dm < dp ? 'm' : dp < dm ? 'p' : null;
+    if (winner){
+      SG[winner] += 2;
+      const d = winner === 'm' ? dm : dp;
+      if (f.v > 0 && d / f.v <= 0.05){ SG[winner]++; note = 'Punktlandung – ein Bonuspunkt!'; }
+    } else { SG.m++; SG.p++; note = 'Gleich nah dran.'; }
+  }
+
+  const row = w => {
+    const val = SG.a[w];
+    const hit = mode === 'mc' ? (val === f.v) : (winner === w);
+    const diff = mode === 'mc' ? (val === f.v ? 'richtig' : 'daneben')
+               : 'Abweichung ' + fmt(Math.abs(val - f.v)) + ' ' + f.u;
+    return `<div class="rw ${w} ${hit?'win':''}">
+              <span class="nm">${NAME[w]}</span>
+              <span class="vl">${fmt(val)} ${f.u}</span>
+              <span class="pt">${diff}</span>
+            </div>`;
+  };
+
+  $('sg-body').innerHTML =
+    `<div class="truth"><span>Richtige Antwort</span><b>${fmtU(f)}</b><i>${f.q}</i></div>
+     <div class="rows">${row('m')}${row('p')}</div>
+     ${note ? `<div class="hintline" style="text-align:center">${note}</div>` : ''}`;
+  sgNextBtn();
+}
+
+/* --- Rauf & Runter --- */
+function sgHilo(){
+  const who = SG.first;
+  const [a,b] = SG.cur.pair;
+  $('sg-body').innerHTML =
+    `<div class="kicker ${who}">${NAME[who]} ist dran</div>
+     <div class="truth"><span>${a.l}</span><b>${fmtU(a)}</b></div>
+     <div class="question" style="text-align:center">${b.l}:<br>mehr oder weniger?</div>`;
+  $('sg-foot').innerHTML =
+    `<div class="two">
+       <button class="btn ghost" id="sg-less">Weniger</button>
+       <button class="btn ${who}" id="sg-more">Mehr</button>
+     </div>`;
+  const judge = guessMore => {
+    const correct = (b.v > a.v) === guessMore;
+    if (correct) SG[who] += 2;
+    $('sg-body').innerHTML =
+      `<div class="truth"><span>${b.l}</span><b>${fmtU(b)}</b>
+         <i>${a.l}: ${fmtU(a)}</i></div>
+       <div class="verdict ${correct?'ok':'no'}">${correct ? NAME[who]+' liegt richtig · +2' : 'Leider daneben'}</div>`;
+    sgNextBtn();
+  };
+  $('sg-more').onclick = () => judge(true);
+  $('sg-less').onclick = () => judge(false);
+}
+
+/* --- Montys Flunkerei --- */
+function sgBluffPrompt(){
+  const who = SG.first, f = SG.cur.fact;
+  $('sg-body').innerHTML =
+    `<div class="kicker ${who}">Nur ${NAME[who]} schaut</div>
+     <div class="question">${NAME[otherOf(who)]}, bitte wegschauen.</div>
+     <div class="hintline">Gleich siehst du die richtige Antwort. Du entscheidest dann, ob du sie ehrlich weitergibst oder flunkerst.</div>`;
+  $('sg-foot').innerHTML = `<button class="btn ${who} big" id="sg-ready">Ich bin allein</button>`;
+  $('sg-ready').onclick = () => sgBluffSet(who);
+}
+
+function sgBluffSet(who){
+  const f = SG.cur.fact;
+  const r = SG.cur.rng = alignRange(makeRange(f.v), f.v);
+  $('sg-body').innerHTML =
+    `<div class="kicker ${who}">${NAME[who]}</div>
+     <div class="question">${f.q}</div>
+     <div class="truth"><span>Die Wahrheit</span><b>${fmtU(f)}</b></div>
+     <div class="hintline">Stelle ein, was du ${NAME[otherOf(who)]} erzählst:</div>
+     <div class="readout"><b id="sg-val">${fmt(f.v)}</b><span>${f.u}</span></div>
+     <input type="range" id="sg-range" min="${r.min}" max="${r.max}" step="${r.step}" value="${f.v}">
+     <div class="range-ends"><span>${fmt(r.min)}</span><span>${fmt(r.max)}</span></div>`;
+  $('sg-foot').innerHTML = `<button class="btn ${who} big" id="sg-ok">Behauptung festlegen</button>`;
+  const rg = $('sg-range');
+  rg.oninput = () => $('sg-val').textContent = fmt(+rg.value);
+  $('sg-ok').onclick = () => { SG.claim = +rg.value; sgBluffJudge(who); };
+}
+
+function sgBluffJudge(who){
+  const other = otherOf(who), f = SG.cur.fact;
+  $('sg-body').innerHTML =
+    `<div class="kicker ${other}">${NAME[other]} entscheidet</div>
+     <div class="question">${f.q}</div>
+     <div class="truth"><span>${NAME[who]} behauptet</span><b>${fmt(SG.claim)} ${f.u}</b></div>`;
+  $('sg-foot').innerHTML =
+    `<div class="two">
+       <button class="btn ${other}" id="sg-truth">Stimmt</button>
+       <button class="btn ghost" id="sg-lie">Geflunkert</button>
+     </div>`;
+  const decide = saysTruth => {
+    const isTruth = Math.abs(SG.claim - f.v) < SG.cur.rng.step/2;
+    const right = saysTruth === isTruth;
+    if (right) SG[other] += 2; else SG[who] += 2;
+    const verdict = right
+      ? NAME[other] + ' durchschaut es · +2'
+      : isTruth
+        ? NAME[who] + ' war ehrlich – ' + NAME[other] + ' glaubt es nicht · +2'
+        : NAME[who] + ' flunkert erfolgreich · +2';
+    $('sg-body').innerHTML =
+      `<div class="truth"><span>Richtige Antwort</span><b>${fmtU(f)}</b>
+         <i>${NAME[who]} behauptete ${fmt(SG.claim)} ${f.u} – ${isTruth ? 'das war die Wahrheit.' : 'das war geflunkert.'}</i></div>
+       <div class="verdict ${right?'ok':'no'}">${verdict}</div>`;
+    sgNextBtn();
+  };
+  $('sg-truth').onclick = () => decide(true);
+  $('sg-lie').onclick = () => decide(false);
+}
+
+function sgNextBtn(){
+  const last = SG.i === SG.qs.length - 1;
+  $('sg-foot').innerHTML =
+    `<div class="rows"><div class="rw">
+       <span class="nm" style="color:var(--monty)">${SG.m}</span>
+       <span class="vl" style="text-align:center;color:var(--muted)">Zwischenstand</span>
+       <span class="nm" style="color:var(--pia);text-align:right">${SG.p}</span>
+     </div></div>
+     <button class="btn primary big" id="sg-next">${last ? 'Runde auswerten' : 'Nächste Frage'}</button>`;
+  $('sg-next').onclick = () => { SG.i++; sgQuestion(); };
+}
+
+function sgEnd(){
+  S.monty += SG.m; S.pia += SG.p; save();
+  const win = SG.m > SG.p ? 'Monty' : SG.p > SG.m ? 'Pia' : null;
+  $('sg-step').textContent = '';
+  $('sg-body').innerHTML =
+    `<div class="final">
+       <b>${SG.m} : ${SG.p}</b>
+       <span>${win ? win + ' gewinnt die Runde' : 'Unentschieden'}</span>
+       <div class="badge">Abendstand: Monty ${S.monty} · Pia ${S.pia}</div>
+     </div>`;
+  $('sg-foot').innerHTML =
+    `<button class="btn primary" id="sg-again">Noch eine Runde</button>
+     <button class="btn ghost" data-go="home">Zurück zur Übersicht</button>`;
+  $('sg-again').onclick = () => sgStart(SG.mode);
+}
+
+/* ============================================================
+   SPIEL 2 — MONTY ERKLÄRT'S
+   ============================================================ */
+const ERK = {round:1, who:'m', hit:0, skip:0, total:0, pool:[], left:60};
+
+function erkIntro(){
+  $('erk-best').textContent = S.bestErk ? 'Euer Bestwert: ' + S.bestErk + ' Begriffe' : '';
+  show('erklaer-intro');
+}
+$('erk-start').onclick = () => { ERK.total = 0; erkRound(1); };
+
+function erkRound(r){
+  ERK.round = r;
+  ERK.who = r === 1 ? 'm' : 'p';
+  ERK.hit = 0; ERK.skip = 0; ERK.left = 60;
+  ERK.pool = shuffle(TERMS.slice());
+  $('erk-who').textContent = NAME[ERK.who] + ' erklärt';
+  $('erk-round').textContent = 'Runde ' + r + '/2';
+  $('erk-hit').textContent = 0;
+  $('erk-skip').textContent = 0;
+  $('erk-word').textContent = ERK.pool.pop();
+  $('erk-timer').textContent = 60;
+  $('erk-timer').classList.remove('low');
+  show('erklaer');
+  const t0 = Date.now();
+  timerId = setInterval(() => {
+    ERK.left = Math.max(0, 60 - Math.floor((Date.now()-t0)/1000));
+    $('erk-timer').textContent = ERK.left;
+    $('erk-timer').classList.toggle('low', ERK.left <= 10);
+    if (ERK.left === 0){ clearInterval(timerId); timerId = null; erkDone(); }
+  }, 200);
+}
+
+function erkWord(){
+  if (!ERK.pool.length) ERK.pool = shuffle(TERMS.slice());
+  $('erk-word').textContent = ERK.pool.pop();
+}
+$('erk-hitBtn').onclick = () => { ERK.hit++; $('erk-hit').textContent = ERK.hit; erkWord(); };
+$('erk-pass').onclick   = () => { ERK.skip++; $('erk-skip').textContent = ERK.skip; erkWord(); };
+
+function erkDone(){
+  ERK.total += ERK.hit;
+  if (ERK.round === 1){
+    $('erk-final').innerHTML =
+      `<b>${ERK.hit}</b><span>Monty hat ${ERK.hit} Begriffe geschafft.<br>Jetzt ist Pia dran.</span>`;
+    $('erk-again').textContent = 'Pia starten';
+    $('erk-again').onclick = () => erkRound(2);
+  } else {
+    const rec = ERK.total > S.bestErk;
+    if (rec){ S.bestErk = ERK.total; save(); }
+    $('erk-final').innerHTML =
+      `<b>${ERK.total}</b><span>Begriffe zusammen · Monty ${ERK.total-ERK.hit} + Pia ${ERK.hit}</span>
+       ${rec ? '<div class="badge">Neuer Bestwert!</div>'
+             : `<div class="badge" style="background:var(--surface2);color:var(--muted)">Bestwert: ${S.bestErk}</div>`}`;
+    $('erk-again').textContent = 'Noch eine Runde';
+    $('erk-again').onclick = () => { ERK.total = 0; erkRound(1); };
+  }
+  show('erklaer-end');
+}
+
+/* ============================================================
+   SPIEL 3 — PIAS KNOTEN
+   ============================================================ */
+const KN = {p:null, idx:0, sel:[], solved:[], lives:4};
+
+function knStart(){
+  let open = KNOTEN.map((_,i) => i).filter(i => !S.knotenDone.includes(i));
+  if (!open.length){ S.knotenDone = []; save(); open = KNOTEN.map((_,i) => i); }
+  knLoad(open[rnd(open.length)]);
+}
+
+function knLoad(idx){
+  KN.idx = idx;
+  KN.p = KNOTEN[idx];
+  KN.sel = []; KN.solved = []; KN.lives = 4;
+  KN.words = shuffle(KN.p.g.flatMap(g => g.slice(1)));
+  $('kn-title').textContent = KN.p.t;
+  $('kn-hint').textContent = 'Findet vier Gruppen mit je vier Wörtern.';
+  $('kn-step').textContent = (S.knotenDone.length+1) + '/' + KNOTEN.length;
+  knDraw();
+  show('knoten');
+}
+
+function knDraw(){
+  $('kn-solved').innerHTML = KN.solved.map(g =>
+    `<div class="grp"><b>${g[0]}</b><span>${g.slice(1).join(' · ')}</span></div>`).join('');
+  $('kn-grid').innerHTML = KN.words.map(w =>
+    `<button class="cell ${KN.sel.includes(w)?'sel':''}" data-w="${w}">${w}</button>`).join('');
+  $('kn-grid').querySelectorAll('.cell').forEach(c => c.onclick = () => {
+    const w = c.dataset.w, k = KN.sel.indexOf(w);
+    if (k >= 0) KN.sel.splice(k,1);
+    else if (KN.sel.length < 4) KN.sel.push(w);
+    knDraw();
+  });
+  $('kn-check').disabled = KN.sel.length !== 4;
+  $('kn-lives').innerHTML = 'Fehler: ' +
+    [0,1,2,3].map(i => `<span class="dot ${i < 4-KN.lives ? '' : 'off'}"></span>`).join('');
+}
+
+$('kn-clear').onclick = () => { KN.sel = []; knDraw(); };
+$('kn-check').onclick = () => {
+  const group = KN.p.g.find(g => KN.sel.every(w => g.includes(w)));
+  if (group){
+    KN.solved.push(group);
+    KN.words = KN.words.filter(w => !group.includes(w));
+    KN.sel = [];
+    if (KN.solved.length === 4){
+      if (!S.knotenDone.includes(KN.idx)){ S.knotenDone.push(KN.idx); save(); }
+      return knEnd(true);
+    }
+    knDraw();
+    return;
+  }
+  const near = KN.p.g.some(g => KN.sel.filter(w => g.includes(w)).length === 3);
+  KN.lives--;
+  $('kn-grid').querySelectorAll('.cell.sel').forEach(c => {
+    c.classList.add('shake');
+    setTimeout(() => c.classList.remove('shake'), 350);
+  });
+  $('kn-hint').textContent = near ? 'Ganz nah dran – ein Wort gehört woanders hin.'
+                                  : 'Nicht ganz. Findet vier Gruppen mit je vier Wörtern.';
+  if (KN.lives <= 0) setTimeout(() => knEnd(false), 400);
+  else { KN.sel = []; knDraw(); }
+};
+
+function knEnd(won){
+  $('kn-final').innerHTML = won
+    ? `<b>Geknackt!</b><span>Alle vier Gruppen gefunden – mit ${4-KN.lives} ${4-KN.lives===1?'Fehler':'Fehlern'}.</span>`
+    : `<b>Verknotet</b><span>Diesmal nicht – hier war die Lösung:</span>`;
+  $('kn-reveal').innerHTML = KN.p.g.map(g =>
+    `<div class="grp"><b>${g[0]}</b><span>${g.slice(1).join(' · ')}</span></div>`).join('');
+  show('knoten-end');
+}
+$('kn-next').onclick = knStart;
+
+/* ============================================================
+   SPIEL 4 — MONTYS TURM
+   ============================================================ */
+const TU = {h:0, lives:3, pool:[], cur:null};
+
+function tuStart(){
+  TU.h = 0; TU.lives = 3;
+  TU.pool = shuffle(WF.slice());
+  tuNext();
+  show('turm');
+}
+
+function tuNext(){
+  if (!TU.pool.length) TU.pool = shuffle(WF.slice());
+  TU.cur = TU.pool.pop();
+  $('tu-stmt').textContent = TU.cur.s;
+  $('tu-verdict').textContent = '';
+  $('tu-h').textContent = TU.h;
+  $('tu-lives').innerHTML = [0,1,2].map(i =>
+    `<span class="dot ${i < TU.lives ? '' : 'off'}"></span>`).join(' ');
+  $('tu-tower').innerHTML = Array(Math.min(TU.h,14)).fill('<div class="brick"></div>').join('');
+  $('tu-foot').innerHTML =
+    `<div class="two">
+       <button class="btn pia" id="tu-true">Wahr</button>
+       <button class="btn monty" id="tu-false">Falsch</button>
+     </div>`;
+  $('tu-true').onclick  = () => tuAnswer(true);
+  $('tu-false').onclick = () => tuAnswer(false);
+}
+
+function tuAnswer(said){
+  const ok = said === TU.cur.w;
+  if (ok) TU.h++; else TU.lives--;
+  $('tu-h').textContent = TU.h;
+  $('tu-tower').innerHTML = Array(Math.min(TU.h,14)).fill('<div class="brick"></div>').join('');
+  $('tu-lives').innerHTML = [0,1,2].map(i =>
+    `<span class="dot ${i < TU.lives ? '' : 'off'}"></span>`).join(' ');
+  $('tu-verdict').className = 'verdict ' + (ok ? 'ok' : 'no');
+  $('tu-verdict').innerHTML =
+    (ok ? 'Richtig!' : 'Leider falsch.') +
+    `<div class="hintline" style="font-weight:400;margin-top:6px">${TU.cur.e}</div>`;
+  $('tu-foot').innerHTML = TU.lives > 0
+    ? `<button class="btn primary big" id="tu-go">Weiterbauen</button>`
+    : `<button class="btn primary big" id="tu-go">Turm auswerten</button>`;
+  $('tu-go').onclick = () => TU.lives > 0 ? tuNext() : tuEnd();
+}
+
+function tuEnd(){
+  const rec = TU.h > S.bestTurm;
+  if (rec){ S.bestTurm = TU.h; save(); }
+  $('tu-final').innerHTML =
+    `<b>${TU.h}</b><span>Steine hoch</span>
+     ${rec ? '<div class="badge">Neuer Bestwert!</div>'
+           : `<div class="badge" style="background:var(--surface2);color:var(--muted)">Bestwert: ${S.bestTurm}</div>`}`;
+  show('turm-end');
+}
+$('tu-again').onclick = tuStart;
+
+/* ============================================================
+   START
+   ============================================================ */
+drawScore();
+if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0){
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

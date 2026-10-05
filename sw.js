@@ -1,5 +1,5 @@
 // Offline-Cache. Version hochzaehlen, wenn Inhalte geaendert wurden.
-const CACHE = 'montopia-v1';
+const CACHE = 'montopia-v2';
 const ASSETS = [
   './',
   './index.html',

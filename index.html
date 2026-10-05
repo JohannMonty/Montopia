@@ -450,12 +450,12 @@ const FACTS = [
 ["Wie viele Atemzüge macht ein Mensch ungefähr pro Tag?","Atemzüge pro Tag",20000,"mal","Körper"],
 ["Wie viele Haare hat ein Mensch ungefähr auf dem Kopf?","Kopfhaare",100000,"Stück","Körper"],
 ["Wie viel Blut hat ein erwachsener Mensch ungefähr?","Blut im Körper",5.5,"Liter","Körper"],
-["Wie hoch ist die normale Körpertemperatur?","Körpertemperatur",37,"°C","Körper"],
-["Wie hoch ist der Ruhepuls eines Erwachsenen im Schnitt?","Ruhepuls",70,"Schläge/Min.","Körper"],
+["Wie hoch ist die normale Körpertemperatur?","Körpertemperatur",37,"°C","Körper",[30,45]],
+["Wie hoch ist der Ruhepuls eines Erwachsenen im Schnitt?","Ruhepuls",70,"Schläge/Min.","Körper",[30,140]],
 
 ["Wie viele Kalorien stecken in 100 Gramm Butter?","100 g Butter",740,"kcal","Essen"],
 ["Wie viele Kalorien stecken in 100 Gramm Gurke?","100 g Gurke",12,"kcal","Essen"],
-["Wie hoch ist der Wasseranteil einer Gurke?","Wasseranteil Gurke",96,"%","Essen"],
+["Wie hoch ist der Wasseranteil einer Gurke?","Wasseranteil Gurke",96,"%","Essen",[0,100]],
 ["Wie viel Zucker steckt in einer 0,33-Liter-Dose Cola?","Zucker in einer Dose Cola",35,"g","Essen"],
 ["Wie viel Kaffee trinken die Deutschen pro Kopf und Jahr?","Kaffee pro Kopf",165,"Liter","Essen"],
 ["Wie viel Bier trinken die Deutschen pro Kopf und Jahr?","Bier pro Kopf",90,"Liter","Essen"],
@@ -490,8 +490,226 @@ const FACTS = [
 ["Wie viele Buchstaben hat das deutsche Alphabet ohne Umlaute und ß?","Deutsches Alphabet",26,"Stück","Kultur"],
 ["Wie viele Löcher hat ein normaler Golfplatz?","Löcher eines Golfplatzes",18,"Stück","Sport"],
 ["Wie viele olympische Ringe gibt es?","Olympische Ringe",5,"Stück","Sport"],
-["Wie viele Noppen hat ein klassischer 2×4-Legostein?","Noppen eines Legosteins",8,"Stück","Kultur"]
-].map(a => ({q:a[0], l:a[1], v:a[2], u:a[3], c:a[4]}));
+["Wie viele Noppen hat ein klassischer 2×4-Legostein?","Noppen eines Legosteins",8,"Stück","Kultur"],
+
+["Wie hoch sind die Petronas Towers in Kuala Lumpur?","Petronas Towers",452,"m","Bauwerke"],
+["Wie hoch ist der Taipei 101?","Taipei 101",508,"m","Bauwerke"],
+["Wie hoch ist der Shanghai Tower?","Shanghai Tower",632,"m","Bauwerke"],
+["Wie hoch ist der Tokyo Skytree?","Tokyo Skytree",634,"m","Bauwerke"],
+["Wie hoch ist das One World Trade Center mit Spitze?","One World Trade Center",541,"m","Bauwerke"],
+["Wie hoch ist das Atomium in Brüssel?","Atomium",102,"m","Bauwerke"],
+["Wie hoch ist die Space Needle in Seattle?","Space Needle",184,"m","Bauwerke"],
+["Wie hoch ist der Triumphbogen in Paris?","Triumphbogen",50,"m","Bauwerke"],
+["Wie hoch ist die Elbphilharmonie?","Elbphilharmonie",110,"m","Bauwerke"],
+["Wie hoch ist der Fernsehturm in Stuttgart?","Fernsehturm Stuttgart",217,"m","Bauwerke"],
+["Wie hoch ist der Commerzbank-Tower in Frankfurt ohne Antenne?","Commerzbank-Tower",259,"m","Bauwerke"],
+["Wie hoch ist die Berliner Siegessäule?","Siegessäule",67,"m","Bauwerke"],
+["Wie hoch ist der Hamburger Michel?","Hamburger Michel",132,"m","Bauwerke"],
+["Wie hoch ist das Straßburger Münster?","Straßburger Münster",142,"m","Bauwerke"],
+["Wie hoch ist der Stephansdom in Wien?","Stephansdom",136,"m","Bauwerke"],
+["Wie hoch soll die Sagrada Família nach Fertigstellung werden?","Sagrada Família",172,"m","Bauwerke"],
+["Wie hoch ist die Glaspyramide des Louvre?","Louvre-Pyramide",21,"m","Bauwerke"],
+["Wie hoch ist der Mont Blanc?","Mont Blanc",4809,"m","Natur"],
+["Wie hoch ist das Matterhorn?","Matterhorn",4478,"m","Natur"],
+["Wie hoch ist der Kilimandscharo?","Kilimandscharo",5895,"m","Natur"],
+["Wie hoch ist der Elbrus, der höchste Berg Europas?","Elbrus",5642,"m","Natur"],
+["Wie hoch ist der Großglockner?","Großglockner",3798,"m","Natur"],
+["Wie hoch ist der Watzmann?","Watzmann",2713,"m","Natur"],
+["Wie hoch ist der Feldberg im Schwarzwald?","Feldberg",1493,"m","Natur"],
+["Wie hoch stürzen die Niagarafälle?","Niagarafälle",51,"m","Natur"],
+["Wie hoch sind die Victoriafälle?","Victoriafälle",108,"m","Natur"],
+["Wie hoch ist der Rheinfall bei Schaffhausen?","Rheinfall",23,"m","Natur"],
+["Wie tief ist der Bodensee an der tiefsten Stelle?","Bodensee",251,"m","Natur"],
+["Wie tief ist der Baikalsee an der tiefsten Stelle?","Baikalsee",1642,"m","Natur"],
+["Wie weit liegt der Spiegel des Toten Meeres unter dem Meeresspiegel?","Totes Meer",430,"m","Natur"],
+["Wie weit springt der Weitsprung-Weltrekord der Männer?","Weitsprung-Weltrekord",8.95,"m","Sport"],
+["Wie hoch ist der Hochsprung-Weltrekord der Männer?","Hochsprung-Weltrekord",2.45,"m","Sport"],
+["Wie hoch hängt ein Volleyballnetz bei den Männern?","Volleyballnetz",2.43,"m","Sport"],
+["Wie hoch ist ein Tennisnetz in der Mitte?","Tennisnetz",0.91,"m","Sport"],
+["Wie weit spannt ein Wanderalbatros die Flügel?","Wanderalbatros",3.5,"m","Tiere"],
+["Wie weit spannt ein Steinadler die Flügel?","Steinadler",2.2,"m","Tiere"],
+["Wie groß wird ein Strauß?","Strauß",2.5,"m","Tiere"],
+["Wie lang ist der menschliche Dünndarm?","Dünndarm",6,"m","Körper"],
+["Wie lang ist der menschliche Dickdarm?","Dickdarm",1.5,"m","Körper"],
+
+["Wie lang ist die Mosel?","Mosel",544,"km","Geografie"],
+["Wie lang ist der Main?","Main",527,"km","Geografie"],
+["Wie lang ist die Weser?","Weser",452,"km","Geografie"],
+["Wie lang ist die Wolga?","Wolga",3530,"km","Geografie"],
+["Wie lang ist der Mississippi?","Mississippi",3778,"km","Geografie"],
+["Wie lang ist der Jangtse?","Jangtse",6300,"km","Geografie"],
+["Wie lang ist die Themse?","Themse",346,"km","Geografie"],
+["Wie lang ist die Loire?","Loire",1006,"km","Geografie"],
+["Wie lang ist der Panamakanal?","Panamakanal",82,"km","Geografie"],
+["Wie lang ist der Suezkanal?","Suezkanal",193,"km","Geografie"],
+["Wie lang ist der Nord-Ostsee-Kanal?","Nord-Ostsee-Kanal",98,"km","Geografie"],
+["Wie lang ist die Transsibirische Eisenbahn?","Transsibirische Eisenbahn",9288,"km","Geografie"],
+["Wie lang war die Route 66 ursprünglich?","Route 66",3940,"km","Geografie"],
+["Wie lang ist der Jakobsweg Camino Francés?","Camino Francés",800,"km","Geografie"],
+["Wie lang ist der Alpenbogen?","Alpen",1200,"km","Geografie"],
+["Wie weit ist Berlin von München Luftlinie entfernt?","Berlin–München",504,"km","Geografie"],
+["Wie groß ist der Durchmesser der Erde?","Durchmesser der Erde",12742,"km","Weltall"],
+["Wie groß ist der Durchmesser des Mondes?","Durchmesser des Mondes",3474,"km","Weltall"],
+["Wie groß ist der Durchmesser der Sonne?","Durchmesser der Sonne",1392000,"km","Weltall"],
+["Wie hoch über der Erde kreist die ISS?","Bahnhöhe der ISS",400,"km","Weltall"],
+
+["Wie nah kommt uns der Mars mindestens?","Erde–Mars",56,"Mio. km","Weltall"],
+
+["Wie schnell fliegt die ISS?","ISS",28000,"km/h","Weltall"],
+["Wie schnell war Usain Bolt in der Spitze?","Usain Bolt",44,"km/h","Sport"],
+["Wie schnell wird ein Rennpferd im Galopp?","Rennpferd",70,"km/h","Tiere"],
+["Wie schnell schwimmt ein Segelfisch?","Segelfisch",110,"km/h","Tiere"],
+["Wie schnell rennt eine Hauskatze?","Hauskatze",48,"km/h","Tiere"],
+["Wie schnell bewegt sich ein Faultier am Boden?","Faultier",0.2,"km/h","Tiere"],
+
+["Wie schwer wird eine Giraffe?","Giraffe",1200,"kg","Tiere"],
+["Wie schwer wird ein Nilpferd?","Nilpferd",1500,"kg","Tiere"],
+["Wie schwer ist die Zunge eines Blauwals?","Blauwalzunge",2700,"kg","Tiere"],
+["Wie schwer ist ein neugeborenes Elefantenkalb?","Elefantenkalb",100,"kg","Tiere"],
+["Wie schwer ist eine Hauskatze im Durchschnitt?","Hauskatze",4.5,"kg","Tiere"],
+["Wie schwer ist die Haut eines Menschen?","Menschliche Haut",10,"kg","Körper"],
+["Wie schwer darf eine Bowlingkugel höchstens sein?","Bowlingkugel",7.26,"kg","Sport"],
+
+["Wie schwer ist ein Kolibri?","Kolibri",4,"g","Tiere"],
+["Wie schwer ist ein Hühnerei der Größe M?","Hühnerei",58,"g","Essen"],
+["Wie schwer ist ein Tennisball?","Tennisball",58,"g","Sport"],
+
+["Wie lange trägt eine Elefantenkuh ihr Junges?","Tragzeit Elefant",22,"Monate","Tiere"],
+["Wie lange trägt ein Blauwal sein Junges?","Tragzeit Blauwal",11,"Monate","Tiere"],
+["Wie lange dauert eine menschliche Schwangerschaft?","Schwangerschaft",9,"Monate","Körper"],
+["Wie lange muss Parmesan mindestens reifen?","Parmesan",12,"Monate","Essen"],
+
+["Wie alt kann ein Grönlandhai werden?","Grönlandhai",300,"Jahre","Tiere"],
+["Wie alt wird ein Graupapagei?","Graupapagei",50,"Jahre","Tiere"],
+["Wie alt wird eine Hausmaus?","Hausmaus",2,"Jahre","Tiere"],
+["Wie hoch ist die Lebenserwartung von Frauen in Deutschland?","Lebenserwartung Frauen",83,"Jahre","Körper"],
+["Wie hoch ist die Lebenserwartung von Männern in Deutschland?","Lebenserwartung Männer",78,"Jahre","Körper"],
+
+["Wie viele Muskeln hat der menschliche Körper?","Muskeln",650,"Stück","Körper"],
+["Wie viele Chromosomen hat ein Mensch?","Chromosomen",46,"Stück","Körper"],
+["Wie viele Gene hat der Mensch ungefähr?","Menschliche Gene",20000,"Stück","Körper"],
+["Wie viele Zähne hat ein Hund?","Zähne eines Hundes",42,"Stück","Tiere"],
+["Wie viele Zähne hat eine Katze?","Zähne einer Katze",30,"Stück","Tiere"],
+["Wie viele Knochen hat eine Katze?","Knochen einer Katze",230,"Stück","Tiere"],
+["Wie viele Augen hat eine Biene?","Augen einer Biene",5,"Stück","Tiere"],
+["Wie viele Bienen leben im Sommer in einem Volk?","Bienenvolk",50000,"Stück","Tiere"],
+["Wie viele Vogelarten gibt es weltweit?","Vogelarten",11000,"Stück","Tiere"],
+["Wie viele Hunderassen erkennt die FCI an?","Hunderassen",350,"Stück","Tiere"],
+["Wie viele Saiten hat eine Konzertharfe?","Konzertharfe",47,"Stück","Kultur"],
+["Wie viele Felder hat ein Monopoly-Brett?","Monopoly-Felder",40,"Stück","Kultur"],
+["Wie viele Buchstabensteine hat deutsches Scrabble?","Scrabble-Steine",102,"Stück","Kultur"],
+["Wie viele Karten hat ein französisches Blatt ohne Joker?","Französisches Blatt",52,"Stück","Kultur"],
+["Wie viele Steine hat ein Doppel-Neun-Dominospiel?","Doppel-Neun-Domino",55,"Stück","Kultur"],
+["Wie hoch ist die Augensumme eines Spielwürfels?","Augensumme Würfel",21,"Stück","Kultur"],
+["Wie viele Figuren hat jede Seite beim Schach?","Schachfiguren je Seite",16,"Stück","Kultur"],
+["Wie viele Bücher hat die protestantische Bibel?","Bücher der Bibel",66,"Stück","Kultur"],
+["Wie viele Folgen hat Game of Thrones?","Game of Thrones",73,"Stück","Kultur"],
+["Wie viele Folgen hat Breaking Bad?","Breaking Bad",62,"Stück","Kultur"],
+["Wie viele Oscars gewann Ben Hur?","Oscars für Ben Hur",11,"Stück","Kultur"],
+["Wie viele Spieler einer Fußballmannschaft stehen auf dem Feld?","Fußball",11,"Stück","Sport"],
+["Wie viele Spieler einer Handballmannschaft stehen auf dem Feld?","Handball",7,"Stück","Sport"],
+["Wie viele Spieler einer Volleyballmannschaft stehen auf dem Feld?","Volleyball",6,"Stück","Sport"],
+["Wie viele Spieler einer Basketballmannschaft stehen auf dem Feld?","Basketball",5,"Stück","Sport"],
+["Wie viele Mitgliedsstaaten hat die EU?","EU-Staaten",27,"Stück","Geografie"],
+["Wie viele Staaten hat Afrika?","Staaten Afrikas",54,"Stück","Geografie"],
+["Wie viele Bundesländer hat Österreich?","Bundesländer Österreichs",9,"Stück","Geografie"],
+["Wie viele Kantone hat die Schweiz?","Kantone",26,"Stück","Geografie"],
+["Wie viele Zeitzonen hat Russland?","Zeitzonen Russlands",11,"Stück","Geografie"],
+["Wie viele Sprachen werden weltweit gesprochen?","Sprachen weltweit",7000,"Stück","Geografie"],
+["Wie viele Käsesorten gibt es in Frankreich?","Käsesorten Frankreichs",1000,"Stück","Essen"],
+
+["Wie lang ist der Film Der Pate?","Der Pate",175,"Minuten","Kultur"],
+["Wie lang ist der Film Avatar?","Avatar",162,"Minuten","Kultur"],
+["Wie lang ist Pulp Fiction?","Pulp Fiction",154,"Minuten","Kultur"],
+["Wie lange dauert ein Fußballspiel ohne Nachspielzeit?","Fußballspiel",90,"Minuten","Sport"],
+["Wie lange dauert die reine Spielzeit eines NBA-Spiels?","NBA-Spiel",48,"Minuten","Sport"],
+["Wie lange braucht die ISS für eine Erdumrundung?","Erdumrundung der ISS",93,"Minuten","Weltall"],
+
+["Wie schnell läuft der 100-Meter-Weltrekord der Männer?","100-Meter-Weltrekord",9.58,"Sekunden","Sport"],
+
+["Wie heiß wird eine Kerzenflamme?","Kerzenflamme",1000,"°C","Natur"],
+["Bei wie viel Grad schmilzt Eisen?","Schmelzpunkt Eisen",1538,"°C","Natur"],
+["Bei wie viel Grad schmilzt Gold?","Schmelzpunkt Gold",1064,"°C","Natur"],
+["Bei wie viel Grad kocht Wasser auf Meereshöhe?","Wasser auf Meereshöhe",100,"°C","Natur"],
+["Bei wie viel Grad wird Milch pasteurisiert?","Pasteurisieren",72,"°C","Essen"],
+
+["Wie viele Kalorien stecken in 100 Gramm Olivenöl?","100 g Olivenöl",880,"kcal","Essen"],
+["Wie viele Kalorien stecken in 100 Gramm Nuss-Nougat-Creme?","100 g Nuss-Nougat-Creme",540,"kcal","Essen"],
+["Wie viele Kalorien stecken in 100 Gramm gekochtem Reis?","100 g Reis",130,"kcal","Essen"],
+
+["Wie scharf ist eine Carolina Reaper?","Carolina Reaper",2200000,"Scoville","Essen"],
+["Wie scharf ist klassische Tabasco-Sauce?","Tabasco",3000,"Scoville","Essen"],
+
+["Wie viel Prozent der Erdoberfläche sind von Wasser bedeckt?","Wasseranteil der Erde",71,"%","Natur",[0,100]],
+["Wie viel Prozent Stickstoff enthält Luft?","Stickstoff in der Luft",78,"%","Natur",[0,100]],
+["Wie viel Prozent Sauerstoff enthält Luft?","Sauerstoff in der Luft",21,"%","Natur",[0,100]],
+["Wie viel Prozent eines erwachsenen Menschen sind Wasser?","Wasseranteil Mensch",60,"%","Körper",[0,100]],
+["Wie stark ist die Schwerkraft auf dem Mond im Vergleich zur Erde?","Mondschwerkraft",17,"%","Weltall",[0,100]],
+["Wie viel Alkohol enthält ein typisches Pils?","Pils",4.8,"%","Essen",[0,60]],
+["Wie viel Alkohol enthält Wodka üblicherweise?","Wodka",40,"%","Essen",[0,60]],
+
+["Wie viel Koffein steckt in einer Tasse Filterkaffee?","Tasse Filterkaffee",80,"mg","Essen"],
+["Wie viel Koffein steckt in einer Dose Cola?","Dose Cola",32,"mg","Essen"],
+
+["Wie viel passt in eine Standard-Weinflasche?","Weinflasche",750,"ml","Essen"],
+["Wie viel Wasser braucht ein einzelner Espresso?","Espresso",25,"ml","Essen"],
+
+["Wie groß ist die Hautoberfläche eines Menschen?","Hautoberfläche",2,"m²","Körper"],
+["Wie groß ist die innere Oberfläche der menschlichen Lunge?","Lungenoberfläche",100,"m²","Körper"],
+["Wie groß ist ein Tennisplatz für Einzel?","Tennisplatz",196,"m²","Sport"],
+
+["Wie schnell wachsen Fingernägel im Monat?","Fingernägel",3,"mm","Körper"],
+["Wie dick ist ein einzelnes Blatt Druckerpapier?","Blatt Papier",0.1,"mm","Alltag"],
+
+["Wie schnell wachsen Kopfhaare im Monat?","Kopfhaare",1,"cm","Körper"],
+["Wie groß ist die Bienenelfe, der kleinste Vogel der Welt?","Bienenelfe",5.5,"cm","Tiere"],
+["Wie groß ist eine neapolitanische Pizza?","Neapolitanische Pizza",30,"cm","Essen"],
+["Wie groß ist ein Mann in Deutschland im Durchschnitt?","Mann in Deutschland",180,"cm","Körper"],
+["Wie groß ist eine Frau in Deutschland im Durchschnitt?","Frau in Deutschland",166,"cm","Körper"],
+
+["Wie viele Nervenzellen hat das menschliche Gehirn?","Nervenzellen im Gehirn",86,"Mrd.","Körper"],
+["Wie viele Sterne hat die Milchstraße?","Sterne der Milchstraße",200,"Mrd.","Weltall"],
+
+["Wie alt ist die Erde?","Alter der Erde",4.5,"Mrd. Jahre","Weltall",[0,20]],
+["Wie alt ist das Universum?","Alter des Universums",13.8,"Mrd. Jahre","Weltall",[0,20]],
+
+["Wie viele Menschen leben in Österreich?","Einwohner Österreichs",9.2,"Mio.","Geografie"],
+["Wie viele Menschen leben in der Schweiz?","Einwohner der Schweiz",8.9,"Mio.","Geografie"],
+["Wie viele Menschen leben in China?","Einwohner Chinas",1410,"Mio.","Geografie"],
+["Wie viele Menschen leben in Indien?","Einwohner Indiens",1430,"Mio.","Geografie"],
+["Wie viele Menschen leben in der Metropolregion Tokio?","Metropolregion Tokio",37,"Mio.","Geografie"],
+["Wie viele Menschen leben in Berlin?","Einwohner Berlins",3.9,"Mio.","Geografie"],
+["Wie viele Menschen leben in Hamburg?","Einwohner Hamburgs",1.9,"Mio.","Geografie"],
+["Wie viele Menschen leben in München?","Einwohner Münchens",1.5,"Mio.","Geografie"],
+
+["Wie groß ist Österreich?","Fläche Österreichs",83879,"km²","Geografie"],
+["Wie groß ist die Schweiz?","Fläche der Schweiz",41285,"km²","Geografie"],
+["Wie groß ist Russland?","Fläche Russlands",17100000,"km²","Geografie"],
+["Wie groß ist Bayern?","Fläche Bayerns",70550,"km²","Geografie"],
+["Wie groß ist der Bodensee?","Fläche des Bodensees",536,"km²","Geografie"],
+
+["Mit wie vielen Umdrehungen pro Minute läuft eine LP?","LP",33,"U/min","Kultur"],
+["Mit wie vielen Umdrehungen pro Minute läuft eine Single?","Single",45,"U/min","Kultur"],
+
+["In welchem Jahr landeten die ersten Menschen auf dem Mond?","Mondlandung",1969,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr fiel die Berliner Mauer?","Mauerfall",1989,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr endete der Zweite Weltkrieg?","Ende des Zweiten Weltkriegs",1945,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr begann der Erste Weltkrieg?","Beginn des Ersten Weltkriegs",1914,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr wurde die Bundesrepublik gegründet?","Gründung der Bundesrepublik",1949,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr sank die Titanic?","Untergang der Titanic",1912,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr wurde das World Wide Web erfunden?","World Wide Web",1989,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr wurde Google gegründet?","Gründung von Google",1998,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr kam das erste iPhone auf den Markt?","Erstes iPhone",2007,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr erreichte Kolumbus Amerika?","Kolumbus",1492,"Jahr","Geschichte",[1000,2030]],
+["In welchem Jahr begann die Französische Revolution?","Französische Revolution",1789,"Jahr","Geschichte",[1000,2030]],
+["Um welches Jahr erfand Gutenberg den Buchdruck mit beweglichen Lettern?","Buchdruck",1450,"Jahr","Geschichte",[1000,2030]],
+
+["Wie lange schläft ein Erwachsener idealerweise pro Nacht?","Schlafbedarf",8,"Stunden","Körper"],
+["Wie lange blieben die Apollo-11-Astronauten auf dem Mond?","Apollo 11 auf dem Mond",21,"Stunden","Weltall"],
+["Wie lange dauert ein Tag auf dem Mars?","Marstag",24.6,"Stunden","Weltall"],
+
+["Wie oft schlägt das Herz eines Kolibris im Flug pro Minute?","Kolibriherz",1200,"Schläge/Min.","Tiere"]
+].map(a => ({q:a[0], l:a[1], v:a[2], u:a[3], c:a[4], r:a[5]}));
 
 /* [Aussage, 1=wahr, Erklärung] */
 const WF = [
@@ -592,7 +810,120 @@ const WF = [
 ["Der Buchstabe W existiert im italienischen Alphabet nicht.",1,"Er kommt nur in Fremdwörtern vor."],
 ["Ein Jahr auf dem Jupiter dauert etwa zwölf Erdjahre.",1,"11,86 Jahre genau."],
 ["Wale sind Fische.",0,"Sie sind Säugetiere."],
-["Der höchste Punkt Deutschlands liegt in Bayern.",1,"Die Zugspitze."]
+["Der höchste Punkt Deutschlands liegt in Bayern.",1,"Die Zugspitze."],
+
+["Ein Chamäleon kann beide Augen unabhängig voneinander bewegen.",1,"Es sieht dadurch fast rundum."],
+["Schmetterlinge schmecken mit den Füßen.",1,"Sie haben dort Geschmackssensoren."],
+["Ameisen schlafen nie.",0,"Sie halten viele sehr kurze Ruhephasen."],
+["Ein Floh kann das Hundertfache seiner Körperlänge springen.",1,"Bezogen auf die Größe ein enormer Sprung."],
+["Krokodile können nicht kauen.",1,"Sie reißen Stücke ab und schlucken sie."],
+["Schlangen hören über Ohren wie wir.",0,"Sie nehmen vor allem Erschütterungen wahr."],
+["Der Tintenfisch kann seine Farbe ändern.",1,"Über Pigmentzellen in der Haut."],
+["Bienen sterben immer, wenn sie stechen.",0,"Nur Honigbienen bei Säugetieren – Wespen und Hummeln nicht."],
+["Hummeln können fliegen, obwohl die Physik es verbietet.",0,"Ein Mythos aus einer fehlerhaften alten Rechnung."],
+["Ein Wal ist mit dem Nilpferd näher verwandt als mit dem Hai.",1,"Beide gehören zu den Paarhufer-Verwandten."],
+["Pinguine haben Knie.",1,"Sie liegen verborgen unter dem Gefieder."],
+["Ein Eichhörnchen vergisst die meisten seiner Verstecke.",1,"Daraus wachsen viele neue Bäume."],
+["Füchse gehören zu den Katzen.",0,"Sie sind Hunde­artige."],
+["Der Koala ist ein Bär.",0,"Er ist ein Beuteltier."],
+["Der Rote Panda ist mit dem Großen Panda eng verwandt.",0,"Er bildet eine eigene Familie."],
+["Nacktmulle sind praktisch schmerzunempfindlich gegen Säure.",1,"Ein beliebtes Forschungsthema."],
+["Gürteltiere können sich alle zu einer Kugel rollen.",0,"Nur wenige Arten beherrschen das."],
+["Ein Kuhfladen zieht mehr Fliegen an als Zucker.",1,"Das ist tatsächlich so."],
+["Kühe haben beste Freundinnen.",1,"Sie zeigen stabile Partnerpräferenzen."],
+["Schafe erkennen Gesichter wieder.",1,"Auch menschliche, über Jahre hinweg."],
+["Schweine können schwitzen.",0,"Deshalb suhlen sie sich zum Abkühlen."],
+["Hunde haben etwa so viele Geruchsrezeptoren wie Menschen.",0,"Sie haben ein Vielfaches davon."],
+["Katzen landen immer auf den Pfoten.",0,"Meistens, aber keineswegs immer."],
+["Ein Papagei versteht die Bedeutung der Wörter, die er nachspricht.",0,"In aller Regel nicht."],
+["Elstern erkennen sich im Spiegel selbst.",1,"Sie bestehen den Spiegeltest."],
+["Es gibt mehr Lebewesen in einer Handvoll Erde als Menschen auf der Welt.",1,"Vor allem Bakterien."],
+["Pilze sind näher mit Tieren verwandt als mit Pflanzen.",1,"Stammesgeschichtlich stimmt das."],
+["Der größte Organismus der Welt ist ein Pilz.",1,"Ein Hallimasch in Oregon."],
+["Bambus ist ein Baum.",0,"Botanisch ist es ein Gras."],
+["Eine Erdnuss wächst unter der Erde.",1,"Daher der Name."],
+["Kartoffeln gehören zu den Nachtschattengewächsen.",1,"Wie Tomaten und Auberginen."],
+["Rhabarberblätter sind giftig.",1,"Wegen des hohen Oxalsäuregehalts."],
+["Muskatnuss ist in großen Mengen giftig.",1,"Sie wirkt dann berauschend und toxisch."],
+["Ein Apfel besteht zu einem Viertel aus Luft.",1,"Deshalb schwimmen Äpfel."],
+["Zimt stammt von der Rinde eines Baumes.",1,"Vom Zimtbaum."],
+["Vanille ist die Frucht einer Orchidee.",1,"Die einzige Orchidee, die als Gewürz genutzt wird."],
+["Safran ist nach Gewicht teurer als Gold.",0,"Teuer, aber deutlich günstiger als Gold."],
+["Pfeffer war im Mittelalter ein Zahlungsmittel.",1,"Daher der Ausdruck Pfeffersack."],
+["Honig besteht fast nur aus Zucker und Wasser.",1,"Über 80 Prozent Zucker."],
+["Weißer Spargel und grüner Spargel sind verschiedene Pflanzen.",0,"Gleiche Pflanze, nur anders angebaut."],
+["Avocados sind für Hunde giftig.",1,"Wie Schokolade und Weintrauben auch."],
+["Schokolade kann für Hunde tödlich sein.",1,"Theobromin können sie kaum abbauen."],
+["Kaffee wurde ursprünglich gegessen, nicht getrunken.",1,"Als Mischung aus Bohnen und Fett."],
+["Cappuccino wird in Italien traditionell nach dem Essen getrunken.",0,"Nur morgens, nie nach dem Mittagessen."],
+["Der Döner Kebab in seiner heutigen Form entstand in Deutschland.",1,"In Berlin in den 1970er Jahren."],
+["Die Kartoffel kam aus Südamerika nach Europa.",1,"Über die Anden und Spanien."],
+["Tomaten galten in Europa lange als giftig.",1,"Man hielt sie für Zierpflanzen."],
+["Das Hawaii-Toast stammt aus Hawaii.",0,"Es wurde in Deutschland erfunden."],
+["Pommes frites kommen ursprünglich aus Frankreich.",0,"Belgien beansprucht die Erfindung."],
+["Die Brezel hat eine feste symbolische Form mit drei Löchern.",1,"Die verschlungene Form ist jahrhundertealt."],
+["Mozzarella wurde ursprünglich aus Büffelmilch gemacht.",1,"Mozzarella di bufala."],
+["Rohmilchkäse ist in der EU verboten.",0,"Er ist erlaubt, nur gekennzeichnet."],
+["Der Kühlschrank wurde vor dem Auto erfunden.",0,"Das Auto kam früher."],
+["Die Zahl Null kam über arabische Vermittlung nach Europa.",1,"Ursprünglich aus Indien."],
+["Römische Zahlen kennen kein Zeichen für Null.",1,"Das System kommt ohne aus."],
+["Eine Billion ist im Deutschen und im Englischen gleich groß.",0,"Englisch billion = deutsche Milliarde."],
+["Ein Kilobyte sind exakt 1000 Byte.",1,"Nach SI-Norm; 1024 ist ein Kibibyte."],
+["Das erste Computerprogramm wurde von einer Frau geschrieben.",1,"Ada Lovelace, im 19. Jahrhundert."],
+["Der erste Computer passte in einen Raum.",1,"Der ENIAC füllte eine ganze Halle."],
+["Die E-Mail ist älter als das World Wide Web.",1,"E-Mail ab 1971, WWW ab 1989."],
+["Das @-Zeichen ist älter als der Computer.",1,"Es war ein kaufmännisches Kürzel."],
+["Bluetooth ist nach einem Wikingerkönig benannt.",1,"Nach Harald Blauzahn."],
+["WLAN und WiFi bezeichnen dasselbe.",1,"WiFi ist der Markenname."],
+["Ein QR-Code wurde in Japan entwickelt.",1,"Ursprünglich für die Autoindustrie."],
+["Der erste Tweet wurde von Elon Musk abgesetzt.",0,"Von Jack Dorsey, dem Mitgründer."],
+["Nokia stellte früher Gummistiefel her.",1,"Und Papier, Kabel und Reifen."],
+["Der Name Google geht auf einen Rechtschreibfehler zurück.",1,"Gemeint war die Zahl Googol."],
+["Das erste YouTube-Video zeigte einen Zoobesuch.",1,"„Me at the zoo“, 2005."],
+["Ein Flugzeug kann mit nur einem Triebwerk weiterfliegen.",1,"Verkehrsflugzeuge sind darauf ausgelegt."],
+["Die sicherste Sitzreihe im Flugzeug ist hinten.",0,"Statistisch gibt es keinen klaren Vorteil."],
+["Beim Start ist das Flugzeug am schwersten.",1,"Wegen des vollen Tanks."],
+["Der Schwarze Kasten im Flugzeug ist schwarz.",0,"Er ist leuchtend orange."],
+["Die Concorde war schneller als der Schall.",1,"Rund doppelte Schallgeschwindigkeit."],
+["Es gibt kein Gate 13 in vielen Flughäfen.",1,"Aus Aberglauben wird die Zahl oft ausgelassen."],
+["Der Eiffelturm war als dauerhaftes Bauwerk geplant.",0,"Er sollte nach 20 Jahren abgerissen werden."],
+["Die Freiheitsstatue war ein Geschenk Frankreichs.",1,"Zum 100. Jahrestag der Unabhängigkeit."],
+["Die Freiheitsstatue war ursprünglich grün.",0,"Sie war kupferfarben und oxidierte."],
+["Big Ben ist der Name des Turms.",0,"So heißt eigentlich die Glocke."],
+["Der Schiefe Turm von Pisa wurde absichtlich schief gebaut.",0,"Der Untergrund gab nach."],
+["Venedig steht auf Holzpfählen.",1,"Millionen davon im Schlick."],
+["Der Buckingham Palace hat über 700 Zimmer.",1,"Rund 775."],
+["In Australien leben mehr Kängurus als Menschen.",1,"Deutlich mehr."],
+["Kanada hat mehr Seen als der Rest der Welt zusammen.",1,"Über zwei Millionen."],
+["Die Sahara war einmal grün.",1,"Vor einigen tausend Jahren."],
+["Der Amazonas hat keine einzige Brücke über den Hauptstrom.",1,"Der Fluss ist dafür zu breit."],
+["Grönland gehört geografisch zu Nordamerika.",1,"Politisch zu Dänemark."],
+["Istanbul liegt auf zwei Kontinenten.",1,"Europa und Asien."],
+["Russland grenzt an mehr als zehn Länder.",1,"An vierzehn."],
+["Der Vatikan ist der kleinste Staat der Welt.",1,"Knapp einen halben Quadratkilometer."],
+["Es gibt ein Land, das komplett von einem anderen umschlossen ist.",1,"Gleich drei: San Marino, Vatikan und Lesotho."],
+["Die Niederlande und Holland sind dasselbe.",0,"Holland sind nur zwei der zwölf Provinzen."],
+["In Island gibt es keine Nachnamen im üblichen Sinn.",1,"Man nutzt Vatersnamen wie Jónsdóttir."],
+["Finnland hat mehr Saunen als Autos.",1,"Rund drei Millionen Saunen."],
+["In Norwegen geht die Sonne im Sommer nicht unter.",1,"Nördlich des Polarkreises."],
+["Die tiefste je gemessene Temperatur auf der Erde lag unter minus 80 Grad.",1,"In der Antarktis, unter minus 89 Grad."],
+["Schnee ist weiß, weil er Licht in alle Richtungen streut.",1,"Die Eiskristalle selbst sind durchsichtig."],
+["Jede Schneeflocke ist einzigartig.",1,"Praktisch ausgeschlossen, zwei gleiche zu finden."],
+["Regenwasser ist chemisch reines Wasser.",0,"Es löst Gase und Partikel aus der Luft."],
+["Ein Regenbogen ist eigentlich ein vollständiger Kreis.",1,"Vom Boden aus sieht man nur den oberen Teil."],
+["Der Mond hat Einfluss auf die Gezeiten.",1,"Gemeinsam mit der Sonne."],
+["Die Erde dreht sich am Äquator mit über 1600 km/h.",1,"Deshalb starten Raketen gern dort."],
+["Auf dem Mond gibt es Wind.",0,"Ohne Atmosphäre kein Wind."],
+["Fußspuren auf dem Mond bleiben Millionen Jahre erhalten.",1,"Es gibt nichts, was sie verwischt."],
+["Die Sonne verliert ständig an Masse.",1,"Durch Kernfusion und Sonnenwind."],
+["Ein schwarzes Loch saugt alles in seiner Umgebung ein.",0,"Nur innerhalb des Ereignishorizonts."],
+["Im Weltall ist es überall eiskalt.",0,"Temperatur braucht Materie – im Vakuum ist der Begriff schwierig."],
+["Pluto gilt seit 2006 nicht mehr als Planet.",1,"Er wurde zum Zwergplaneten erklärt."],
+["Der Nordstern ist der hellste Stern am Himmel.",0,"Sirius ist deutlich heller."],
+["Sternbilder sind räumlich zusammengehörige Sterngruppen.",0,"Sie sehen nur von der Erde aus so aus."],
+["Licht von manchen sichtbaren Sternen ist älter als die Menschheit.",1,"Es war tausende Jahre unterwegs."],
+["Man altert im Weltall minimal langsamer als auf der Erde.",1,"Relativistischer Effekt, messbar bei ISS-Astronauten."],
+["Astronauten werden im Weltall etwas größer.",1,"Die Wirbelsäule dehnt sich ohne Schwerkraft."]
 ].map(a => ({s:a[0], w:!!a[1], e:a[2]}));
 
 const TERMS = [
@@ -619,7 +950,42 @@ const TERMS = [
 "Trampolin","Schiedsrichter","Kegelbahn","Fallschirmsprung","Yogamatte","Stadionwelle","Angelrute","Schlittschuh",
 "Tauchen","Hula-Hoop","Boxhandschuh","Wanderstock","Tischtennis","Bergsteigen",
 "Regenbogen","Gewitter","Sanddüne","Schneeflocke","Vollmond","Nebelbank","Herbstlaub","Wasserfall",
-"Sonnenfinsternis","Gänseblümchen","Lawine","Pusteblume","Sternschnuppe","Eiszapfen"
+"Sonnenfinsternis","Gänseblümchen","Lawine","Pusteblume","Sternschnuppe","Eiszapfen",
+
+"Bettdecke","Kaffeetasse","Schneebesen","Korkenzieher","Bilderrahmen","Türklingel","Wäschekorb","Zahnseide",
+"Nagelfeile","Schuhlöffel","Gießkanne","Hängematte","Picknickdecke","Sonnenbrille","Regenjacke","Hausschuhe",
+"Kuscheltier","Spardose","Pflaster","Thermoskanne","Flaschenöffner","Geschirrtuch","Fliegenklatsche",
+"Heizdecke","Türstopper","Kerzendocht","Luftmatratze","Kofferwaage","Reisepass","Einkaufswagen","Pfandflasche",
+"Quittung","Treppengeländer","Ohrstöpsel","Fensterbank",
+"Rührteig","Hefezopf","Stollen","Apfelstrudel","Käsekuchen","Nudelholz","Sahnehaube","Zuckerguss","Butterbrot",
+"Bratkartoffeln","Rotkohl","Linsensuppe","Kartoffelsalat","Sauerkraut","Pellkartoffel","Mettbrötchen",
+"Knäckebrot","Rosinenbrötchen","Vanillesoße","Kakaopulver","Teebeutel","Limonade","Gewürzgurke","Räucherlachs",
+"Meerrettich","Krabbencocktail","Milchschaum","Eisbecher","Schokoriegel","Erdnussbutter",
+"Otter","Luchs","Biber","Dachs","Maulwurf","Specht","Storch","Kuckuck","Reh","Hirsch","Gans","Esel","Lama",
+"Kamel","Zebra","Giraffe","Koala","Gürteltier","Tintenfisch","Seestern","Hummer","Grille","Heuschrecke",
+"Hornisse","Glühwürmchen","Kaulquappe","Feuersalamander","Blindschleiche","Siebenschläfer","Wüstenfuchs",
+"Marktplatz","Rathaus","Fußgängerzone","Hafenkai","Aussichtsturm","Denkmal","Brunnen","Allee","Fähranleger",
+"Wartezimmer","Umkleidekabine","Dachboden","Garage","Heizungskeller","Gartenlaube","Schrebergarten","Scheune",
+"Bergwerk","Windpark","Staudamm","Seilbahn","Rastplatz","Baustelle","Autobahnkreuz","Stadtpark",
+"Krankenpfleger","Richter","Archäologe","Meteorologe","Taucher","Lokführer","Kellner","Schneider","Goldschmied",
+"Bibliothekarin","Bergführer","Hufschmied","Sommelier","Puppenspieler","Tontechniker","Steuerberater",
+"Landwirt","Hundefriseur","Rettungsschwimmer","Nachtwächter",
+"Kinokarte","Filmmusik","Statist","Regiestuhl","Maskenbildner","Blockbuster","Fortsetzung","Serienfinale",
+"Hauptrolle","Rampenlicht","Zugabe","Applaus","Bühnenbild","Orchestergraben","Chorprobe","Notenständer",
+"Plattenspieler","Ohrwurm","Festivalbändchen","Lampionfest","Faschingskostüm","Silvesterrakete","Osterhase",
+"Adventskalender","Polterabend","Hochzeitstorte","Geburtstagsständchen","Autogrammkarte",
+"Neid","Dankbarkeit","Heimlichkeit","Zuversicht","Trotz","Sehnsucht","Erleichterung","Stolz",
+"Mitgefühl","Enttäuschung","Gelassenheit","Schüchternheit","Gewohnheit","Missverständnis","Aberwitz",
+"Ausrede","Vorurteil","Pünktlichkeit","Großzügigkeit","Schweigen","Wiedersehen","Abschied","Vertrauen",
+"Suchverlauf","Cloudspeicher","Standortfreigabe","Schnellladegerät","Bildschirmzeit","Autokorrektur",
+"Emoji","Podcast","Streamingdienst","Routenplaner","Webcam","Drucker","Festplatte","Maus","Ladebalken",
+"Klingelton","Benachrichtigung","Kalendereintrag","Abo-Falle","Nutzerkonto",
+"Federball","Minigolf","Tretboot","Klettersteig","Schwimmflügel","Sprungbrett","Startblock","Zielgerade",
+"Trillerpfeife","Eckfahne","Elfmeter","Siegerehrung","Medaille","Pokal","Trainerbank","Auswechslung",
+"Schneeballschlacht","Drachensteigen","Lagerfeuer","Stockbrot",
+"Morgentau","Abendrot","Windstille","Bergnebel","Gezeiten","Ebbe","Flut","Dünung","Treibholz","Korallenriff",
+"Vulkanausbruch","Erdbeben","Geysir","Polarlicht","Milchstraße","Mondsichel","Gewitterwolke","Hagelkorn",
+"Raureif","Schmelzwasser","Tropfsteinhöhle","Moorlandschaft","Steppe","Urwald"
 ];
 
 /* Jede Gruppe: [Überschrift, 4 Wörter] */
@@ -694,7 +1060,73 @@ const KNOTEN = [
   ["Monat","März","Mai","Juli","August"],
   ["Römischer Herrscher","Augustus","Julius","Claudius","Nero"],
   ["Wochentag","Montag","Freitag","Sonntag","Mittwoch"],
-  ["Jahreszeit","Frühling","Sommer","Herbst","Winter"]]}
+  ["Jahreszeit","Frühling","Sommer","Herbst","Winter"]]},
+
+{t:"Tierisch gut", g:[
+  ["Lebt im Wald","Reh","Dachs","Eichhörnchen","Specht"],
+  ["Hat einen Panzer","Schildkröte","Hummer","Käfer","Gürteltier"],
+  ["Zugvogel","Storch","Kranich","Schwalbe","Kuckuck"],
+  ["Sternzeichen","Widder","Stier","Krebs","Löwe"]]},
+
+{t:"Guter Ton", g:[
+  ["Blasinstrument","Trompete","Flöte","Klarinette","Posaune"],
+  ["Lautstärke in Noten","Piano","Forte","Crescendo","Fortissimo"],
+  ["Berühmter Komponist","Bach","Mozart","Brahms","Chopin"],
+  ["Teil eines Liedes","Strophe","Refrain","Bridge","Intro"]]},
+
+{t:"Auf dem Schreibtisch", g:[
+  ["Zum Schreiben","Kugelschreiber","Bleistift","Füller","Filzstift"],
+  ["Hält zusammen","Büroklammer","Tacker","Klebeband","Gummiband"],
+  ["Papierformat","Brief","Notizblock","Mappe","Umschlag"],
+  ["Rechnet","Taschenrechner","Tabelle","Formel","Summe"]]},
+
+{t:"Grün hinter den Ohren", g:[
+  ["Grünes Gemüse","Brokkoli","Zucchini","Erbse","Spinat"],
+  ["Kräutergarten","Basilikum","Petersilie","Schnittlauch","Thymian"],
+  ["Nadelbaum","Fichte","Tanne","Kiefer","Lärche"],
+  ["Redewendung mit Grün","Grünschnabel","Grünzeug","Grüne Welle","Grünes Licht"]]},
+
+{t:"Ab in den Süden", g:[
+  ["Spanische Stadt","Sevilla","Granada","Valencia","Bilbao"],
+  ["Mittelmeerinsel","Kreta","Korsika","Sardinien","Malta"],
+  ["Tapas-Teller","Oliven","Chorizo","Manchego","Patatas"],
+  ["Sommerurlaub","Strandtuch","Sonnencreme","Flipflops","Luftmatratze"]]},
+
+{t:"Alles Handarbeit", g:[
+  ["Wird gestrickt","Schal","Mütze","Socke","Pullover"],
+  ["Beim Nähen","Nadel","Faden","Knopf","Reißverschluss"],
+  ["Holzwerkstatt","Hobel","Leim","Schraubzwinge","Schleifpapier"],
+  ["Beim Malen","Pinsel","Staffelei","Palette","Leinwand"]]},
+
+{t:"Bahn frei", g:[
+  ["Teil eines Zuges","Lok","Waggon","Abteil","Speisewagen"],
+  ["Am Bahnhof","Gleis","Bahnsteig","Anzeigetafel","Schließfach"],
+  ["Fahrrad","Lenker","Sattel","Speiche","Klingel"],
+  ["Im Auto","Kupplung","Blinker","Handbremse","Rückspiegel"]]},
+
+{t:"Zahlenspiele", g:[
+  ["Rechenart","Addition","Division","Potenz","Wurzel"],
+  ["Geometrische Form","Kreis","Raute","Trapez","Kegel"],
+  ["Maßeinheit","Meter","Gramm","Sekunde","Ampere"],
+  ["Glücksspiel","Lotto","Roulette","Würfeln","Bingo"]]},
+
+{t:"Märchenstunde", g:[
+  ["Märchenfigur","Rumpelstilzchen","Rapunzel","Schneewittchen","Aschenputtel"],
+  ["Fabelwesen","Einhorn","Drache","Zwerg","Elfe"],
+  ["Im Schloss","Thron","Zugbrücke","Burggraben","Verlies"],
+  ["Zauberei","Zauberstab","Trank","Fluch","Besen"]]},
+
+{t:"Frisch gestrichen", g:[
+  ["Gelbton","Ocker","Safran","Honiggelb","Zitrone"],
+  ["Werkzeug beim Streichen","Rolle","Abdeckfolie","Spachtel","Kreppband"],
+  ["Material im Bau","Beton","Gips","Ziegel","Mörtel"],
+  ["Teil eines Fensters","Scheibe","Griff","Rollladen","Dichtung"]]},
+
+{t:"Guten Abend", g:[
+  ["Am Himmel","Mond","Stern","Planet","Komet"],
+  ["Vorm Schlafen","Gutenachtgeschichte","Zähneputzen","Wecker stellen","Licht aus"],
+  ["Abendprogramm","Tatort","Tagesschau","Talkshow","Spielfilm"],
+  ["Kneipenabend","Bierdeckel","Dartscheibe","Tresen","Zapfhahn"]]}
 ];
 
 /* ============================================================
@@ -703,8 +1135,12 @@ const KNOTEN = [
 const $ = id => document.getElementById(id);
 const rnd = n => Math.floor(Math.random()*n);
 const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];} return a; };
-const fmt = n => n.toLocaleString('de-DE',{maximumFractionDigits:2});
-const fmtU = f => fmt(f.v)+' '+f.u;
+/* Jahreszahlen brauchen weder Tausenderpunkt noch nachgestellte Einheit. */
+const isYear = u => u === 'Jahr';
+const fmt = (n, u) => isYear(u) ? String(Math.round(n)) : n.toLocaleString('de-DE',{maximumFractionDigits:2});
+const unitOf = f => isYear(f.u) ? '' : f.u;
+const diffUnit = f => isYear(f.u) ? 'Jahre' : f.u;
+const fmtU = f => isYear(f.u) ? String(f.v) : fmt(f.v) + ' ' + f.u;
 
 /* Rundet auf zwei signifikante Stellen – erzeugt plausible Falschantworten. */
 function roundNice(x){
@@ -722,37 +1158,66 @@ function niceStep(span){
   return +(mult*mag).toPrecision(2);
 }
 
-/* Bereich um den wahren Wert, dessen Position zufällig variiert. */
-function makeRange(v){
-  const span = v * (2.2 + Math.random()*1.8);
-  const pos  = 0.22 + Math.random()*0.56;
-  let lo = Math.max(0, v - span*pos);
-  let hi = lo + span;
+/* Bereich um den wahren Wert. Ohne feste Grenzen variiert die Lage des Werts zufällig. */
+function makeRange(f){
+  const v = f.v;
+  let lo, hi;
+  if (f.r){
+    lo = f.r[0]; hi = f.r[1];
+  } else {
+    const span = v * (2.2 + Math.random()*1.8);
+    const pos  = 0.22 + Math.random()*0.56;
+    lo = Math.max(0, v - span*pos);
+    hi = lo + span;
+  }
   let step = niceStep(hi-lo);
-  if (Number.isInteger(v)) step = Math.max(1, Math.round(step));
+  if (Number.isInteger(v) && Number.isInteger(lo)) step = Math.max(1, Math.round(step));
   const dec = Math.max(0, Math.min(6, -Math.floor(Math.log10(step))));
-  return {
-    min: +(Math.floor(lo/step)*step).toFixed(dec),
-    max: +(Math.ceil(hi/step)*step).toFixed(dec),
-    step: step, dec: dec
-  };
+  let min = +(Math.floor(lo/step)*step).toFixed(dec);
+  let max = +(Math.ceil(hi/step)*step).toFixed(dec);
+  while (min > v) min = +(min - step).toFixed(dec);
+  while (max < v) max = +(max + step).toFixed(dec);
+  return {min:min, max:max, step:step, dec:dec};
 }
 
 /* Baut das Raster vom wahren Wert aus auf, damit er exakt treffbar bleibt (fürs Flunkern). */
 function alignRange(r, v){
   const step = r.step;
+  const prec = Math.min(12, r.dec + 6);
   let below = Math.max(1, Math.round((v - r.min)/step));
-  if (v - below*step < 0) below = Math.max(1, Math.floor(v/step));
+  if (v - below*step < -1e-9) below = Math.max(1, Math.floor(v/step));
   const above = Math.max(1, Math.round((r.max - v)/step));
   return {
-    min: +(v - below*step).toPrecision(12),
-    max: +(v + above*step).toPrecision(12),
+    min: +((v - below*step).toFixed(prec)) || 0,
+    max: +((v + above*step).toFixed(prec)),
     step: step, dec: r.dec
   };
 }
 
-function distractors(v){
+function distractors(f){
+  const v = f.v;
   const out = [];
+  if (f.r){
+    // Bei festen Grenzen muessen die Falschantworten in der Naehe und im Bereich bleiben.
+    const span = f.r[1] - f.r[0];
+    const round = Number.isInteger(v) ? (x => Math.round(x)) : (x => Math.round(x*10)/10);
+    let sign = Math.random() < 0.5 ? 1 : -1;
+    for (const o of shuffle([0.05, 0.09, 0.14, 0.2, 0.28, 0.38])){
+      let d = round(v + sign*o*span);
+      if (d < f.r[0] || d > f.r[1]) d = round(v - sign*o*span);
+      sign = -sign;
+      if (d >= f.r[0] && d <= f.r[1] && d !== v && !out.includes(d)) out.push(d);
+      if (out.length === 3) break;
+    }
+    const stepOut = Number.isInteger(v) ? 1 : 0.1;
+    let k = 1;
+    while (out.length < 3){
+      const d = round(v + k*stepOut);
+      if (d !== v && !out.includes(d)) out.push(d);
+      k++;
+    }
+    return out;
+  }
   for (const m of shuffle([0.3,0.45,0.6,0.78,1.3,1.7,2.2,3.0])){
     const d = roundNice(v*m);
     if (d > 0 && d !== v && !out.includes(d)) out.push(d);
@@ -886,12 +1351,12 @@ function sgInput(who){
   const mode = SG.cur.mode;
 
   if (mode === 'mc'){
-    if (!SG.cur.opts) SG.cur.opts = shuffle(distractors(f.v).concat([f.v]));
+    if (!SG.cur.opts) SG.cur.opts = shuffle(distractors(f).concat([f.v]));
     $('sg-body').innerHTML =
       `<div class="kicker ${who}">${NAME[who]}</div>
        <div class="question">${f.q}</div>
        <div class="opts">${SG.cur.opts.map((o,k) =>
-         `<button class="opt" data-k="${k}">${fmt(o)} ${f.u}</button>`).join('')}</div>`;
+         `<button class="opt" data-k="${k}">${fmt(o, f.u)} ${unitOf(f)}</button>`).join('')}</div>`;
     $('sg-foot').innerHTML = '';
     $('sg-body').querySelectorAll('.opt').forEach(b => b.onclick = () => {
       SG.a[who] = SG.cur.opts[+b.dataset.k];
@@ -901,19 +1366,19 @@ function sgInput(who){
   }
 
   /* slider + price */
-  if (!SG.cur.rng) SG.cur.rng = makeRange(f.v);
+  if (!SG.cur.rng) SG.cur.rng = makeRange(f);
   const r = SG.cur.rng;
   const start = +( (r.min + (r.max-r.min)/2).toFixed(2) );
   $('sg-body').innerHTML =
     `<div class="kicker ${who}">${NAME[who]}</div>
      <div class="question">${f.q}</div>
      ${mode === 'price' ? '<div class="hintline">Nicht überschätzen – wer drüber liegt, ist raus.</div>' : ''}
-     <div class="readout"><b id="sg-val">${fmt(start)}</b><span>${f.u}</span></div>
+     <div class="readout"><b id="sg-val">${fmt(start, f.u)}</b><span>${unitOf(f)}</span></div>
      <input type="range" id="sg-range" min="${r.min}" max="${r.max}" step="${r.step}" value="${start}">
-     <div class="range-ends"><span>${fmt(r.min)}</span><span>${fmt(r.max)}</span></div>`;
+     <div class="range-ends"><span>${fmt(r.min, f.u)}</span><span>${fmt(r.max, f.u)}</span></div>`;
   $('sg-foot').innerHTML = `<button class="btn ${who} big" id="sg-ok">Tipp abgeben</button>`;
   const rg = $('sg-range');
-  rg.oninput = () => $('sg-val').textContent = fmt(+rg.value);
+  rg.oninput = () => $('sg-val').textContent = fmt(+rg.value, f.u);
   $('sg-ok').onclick = () => { SG.a[who] = +rg.value; sgAfterInput(who); };
 }
 
@@ -954,10 +1419,10 @@ function sgReveal(){
     const val = SG.a[w];
     const hit = mode === 'mc' ? (val === f.v) : (winner === w);
     const diff = mode === 'mc' ? (val === f.v ? 'richtig' : 'daneben')
-               : 'Abweichung ' + fmt(Math.abs(val - f.v)) + ' ' + f.u;
+               : 'Abweichung ' + fmt(Math.abs(val - f.v)) + ' ' + diffUnit(f);
     return `<div class="rw ${w} ${hit?'win':''}">
               <span class="nm">${NAME[w]}</span>
-              <span class="vl">${fmt(val)} ${f.u}</span>
+              <span class="vl">${fmt(val, f.u)} ${unitOf(f)}</span>
               <span class="pt">${diff}</span>
             </div>`;
   };
@@ -1008,18 +1473,18 @@ function sgBluffPrompt(){
 
 function sgBluffSet(who){
   const f = SG.cur.fact;
-  const r = SG.cur.rng = alignRange(makeRange(f.v), f.v);
+  const r = SG.cur.rng = alignRange(makeRange(f), f.v);
   $('sg-body').innerHTML =
     `<div class="kicker ${who}">${NAME[who]}</div>
      <div class="question">${f.q}</div>
      <div class="truth"><span>Die Wahrheit</span><b>${fmtU(f)}</b></div>
      <div class="hintline">Stelle ein, was du ${NAME[otherOf(who)]} erzählst:</div>
-     <div class="readout"><b id="sg-val">${fmt(f.v)}</b><span>${f.u}</span></div>
+     <div class="readout"><b id="sg-val">${fmt(f.v, f.u)}</b><span>${unitOf(f)}</span></div>
      <input type="range" id="sg-range" min="${r.min}" max="${r.max}" step="${r.step}" value="${f.v}">
-     <div class="range-ends"><span>${fmt(r.min)}</span><span>${fmt(r.max)}</span></div>`;
+     <div class="range-ends"><span>${fmt(r.min, f.u)}</span><span>${fmt(r.max, f.u)}</span></div>`;
   $('sg-foot').innerHTML = `<button class="btn ${who} big" id="sg-ok">Behauptung festlegen</button>`;
   const rg = $('sg-range');
-  rg.oninput = () => $('sg-val').textContent = fmt(+rg.value);
+  rg.oninput = () => $('sg-val').textContent = fmt(+rg.value, f.u);
   $('sg-ok').onclick = () => { SG.claim = +rg.value; sgBluffJudge(who); };
 }
 
@@ -1028,7 +1493,7 @@ function sgBluffJudge(who){
   $('sg-body').innerHTML =
     `<div class="kicker ${other}">${NAME[other]} entscheidet</div>
      <div class="question">${f.q}</div>
-     <div class="truth"><span>${NAME[who]} behauptet</span><b>${fmt(SG.claim)} ${f.u}</b></div>`;
+     <div class="truth"><span>${NAME[who]} behauptet</span><b>${fmt(SG.claim, f.u)} ${unitOf(f)}</b></div>`;
   $('sg-foot').innerHTML =
     `<div class="two">
        <button class="btn ${other}" id="sg-truth">Stimmt</button>
@@ -1045,7 +1510,7 @@ function sgBluffJudge(who){
         : NAME[who] + ' flunkert erfolgreich · +2';
     $('sg-body').innerHTML =
       `<div class="truth"><span>Richtige Antwort</span><b>${fmtU(f)}</b>
-         <i>${NAME[who]} behauptete ${fmt(SG.claim)} ${f.u} – ${isTruth ? 'das war die Wahrheit.' : 'das war geflunkert.'}</i></div>
+         <i>${NAME[who]} behauptete ${fmt(SG.claim, f.u)} ${unitOf(f)} – ${isTruth ? 'das war die Wahrheit.' : 'das war geflunkert.'}</i></div>
        <div class="verdict ${right?'ok':'no'}">${verdict}</div>`;
     sgNextBtn();
   };

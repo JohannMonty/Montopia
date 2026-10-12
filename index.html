@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
 <title>Montopia</title>
-<meta name="description" content="Spieleabend für Monty & Pia">
-<meta name="theme-color" content="#14101c">
+<meta name="description" content="Spieleabend für zwei">
+<meta name="theme-color" content="#0d0a16">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Montopia">
@@ -13,41 +13,57 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <style>
 :root{
-  --bg:#14101c; --surface:#1e1829; --surface2:#271f35; --line:#352b47;
-  --fg:#f4eff9; --muted:#a294b8;
-  --monty:#f4a259; --pia:#5fc9b5;
+  --bg:#0d0a16; --bg2:#171126;
+  --surface:rgba(255,255,255,.055); --surface2:rgba(255,255,255,.09); --line:rgba(255,255,255,.11);
+  --fg:#f7f3fc; --muted:#a99dbf; --ink:#140f1d;
+  /* Spielerfarben – werden je Paar per JS gesetzt */
+  --a:#f4a259; --b:#5fc9b5;
   --good:#6ee7b7; --bad:#fb7185;
-  --r:18px;
+  --r:20px;
+  --ease:cubic-bezier(.2,.8,.2,1);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
 html,body{height:100%}
 body{
   background:var(--bg); color:var(--fg);
-  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
   overflow-x:hidden; overscroll-behavior:none;
-  background-image:
-    radial-gradient(900px 500px at 15% -5%, rgba(244,162,89,.10), transparent 60%),
-    radial-gradient(800px 500px at 90% 100%, rgba(95,201,181,.09), transparent 60%);
-  background-attachment:fixed;
 }
+body::before,body::after{
+  content:""; position:fixed; z-index:-1; width:90vmax; height:90vmax; border-radius:50%;
+  pointer-events:none; opacity:.2; animation:drift 24s ease-in-out infinite alternate;
+}
+body::before{background:radial-gradient(circle,var(--a),transparent 62%);top:-50vmax;left:-40vmax}
+body::after{background:radial-gradient(circle,var(--b),transparent 62%);bottom:-50vmax;right:-40vmax;animation-delay:-12s}
+@keyframes drift{to{transform:translate(14vmax,12vmax) scale(1.12)}}
 .serif{font-family:ui-serif,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
 
 /* ---------- Grundgerüst ---------- */
 .screen{
-  display:none; flex-direction:column; min-height:100%;
-  padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+  display:none; flex-direction:column; min-height:100%; max-width:560px; margin:0 auto;
+  padding:calc(18px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));
 }
-.screen.on{display:flex; animation:in .28s ease both}
-@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.screen.on{display:flex; animation:in .4s var(--ease) both}
+@keyframes in{from{opacity:0;transform:translateY(14px) scale(.99)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.92);opacity:.4}60%{transform:scale(1.04);opacity:1}100%{transform:scale(1)}}
+@keyframes flip{from{opacity:0;transform:perspective(700px) rotateX(-40deg) translateY(12px)}to{opacity:1;transform:none}}
+@keyframes sh{0%,100%{transform:none}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes pulse{50%{transform:scale(1.06)}}
 
-.topbar{display:flex;align-items:center;gap:12px;margin-bottom:18px;min-height:34px}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;min-height:38px}
 .back{
   background:var(--surface);border:1px solid var(--line);color:var(--fg);
-  width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;flex:none;
+  width:38px;height:38px;border-radius:12px;font-size:22px;line-height:1;flex:none;
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);transition:transform .15s var(--ease);
 }
-.topbar h2{font-size:16px;font-weight:600;letter-spacing:.2px;flex:1;min-width:0;
+.back:active{transform:scale(.9)}
+.topbar h2{font-size:17px;font-weight:700;letter-spacing:-.1px;flex:1;min-width:0;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.step{font-size:13px;color:var(--muted);flex:none}
+.step{font-size:13px;color:var(--muted);flex:none;padding:5px 11px;border-radius:99px;
+  background:var(--surface);border:1px solid var(--line);font-variant-numeric:tabular-nums}
+.step:empty{display:none}
 
 .center{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px}
 .bottom{margin-top:auto;padding-top:18px;display:flex;flex-direction:column;gap:10px}
@@ -55,188 +71,301 @@ body{
 /* ---------- Buttons ---------- */
 button{font:inherit;color:inherit;cursor:pointer}
 .btn{
-  width:100%;padding:16px;border-radius:var(--r);border:1px solid var(--line);
-  background:var(--surface);font-weight:600;font-size:16px;text-align:center;
-  transition:transform .12s ease, background .15s ease;
+  width:100%;padding:16px;border-radius:16px;border:1px solid var(--line);
+  background:var(--surface);font-weight:650;font-size:16px;text-align:center;
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  transition:transform .15s var(--ease), opacity .2s, filter .2s;
 }
-.btn:active{transform:scale(.985)}
-.btn.primary{background:var(--fg);color:#140f1d;border-color:var(--fg)}
-.btn.ghost{background:transparent;color:var(--muted);border-color:var(--line);font-weight:500}
-.btn.monty{background:var(--monty);color:#241403;border-color:var(--monty)}
-.btn.pia{background:var(--pia);color:#06251f;border-color:var(--pia)}
-.btn.big{padding:22px 16px;font-size:19px}
-.btn[disabled]{opacity:.45}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:linear-gradient(135deg,var(--a),var(--b));color:var(--ink);border-color:transparent;
+  box-shadow:0 14px 30px -14px rgba(0,0,0,.8)}
+.btn.ghost{background:transparent;color:var(--muted);font-weight:550}
+.btn.m{background:var(--a);color:var(--ink);border-color:transparent}
+.btn.p{background:var(--b);color:var(--ink);border-color:transparent}
+.btn.big{padding:20px 16px;font-size:18px}
+.btn[disabled]{opacity:.4;filter:saturate(.3)}
 .two{display:flex;gap:12px}
 .two>.btn{flex:1 1 0;min-width:0}
 
+/* ---------- Wer spielt? ---------- */
+.who-q{font-size:clamp(28px,8vw,38px);font-weight:750;letter-spacing:-.6px;line-height:1.15}
+.pairs{display:flex;flex-direction:column;gap:14px}
+.pair{
+  position:relative;overflow:hidden;display:flex;align-items:center;gap:16px;width:100%;text-align:left;
+  padding:20px 18px;border-radius:24px;border:1px solid var(--line);background:var(--surface);
+  transition:transform .15s var(--ease);animation:rise .5s var(--ease) both;
+}
+.pair:nth-child(2){animation-delay:.08s}
+.pair::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,var(--c1),var(--c2));opacity:.18}
+.pair:active{transform:scale(.98)}
+.avs{display:flex;flex:none;position:relative}
+.av{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:20px;
+  color:var(--ink);border:3px solid var(--bg2)}
+.av+.av{margin-left:-14px}
+.pair .tx{flex:1;min-width:0;position:relative}
+.pair .tx b{display:block;font-size:20px;font-weight:750;letter-spacing:-.2px}
+.pair .tx span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.pair .ar{position:relative;color:var(--muted);font-size:22px}
+
 /* ---------- Start ---------- */
-.wordmark{font-size:clamp(40px,13vw,58px);font-weight:600;letter-spacing:-1px;line-height:1}
-.wordmark i{font-style:normal;color:var(--monty)}
-.wordmark b{font-weight:600;color:var(--pia)}
+.wordmark{
+  font-size:clamp(44px,14vw,62px);font-weight:700;letter-spacing:-1.5px;line-height:1.05;
+  background:linear-gradient(100deg,var(--a),#fff,var(--b),var(--a));background-size:300% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:shine 10s linear infinite;
+}
+@keyframes shine{to{background-position:-300% center}}
 .tagline{color:var(--muted);font-size:14px;margin-top:8px}
+.homehead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;flex:none;margin-top:6px;
+  padding:8px 13px;border-radius:99px;background:var(--surface);border:1px solid var(--line);
+  font-size:13px;color:var(--muted);transition:transform .15s var(--ease);
+}
+.chip:active{transform:scale(.94)}
+.label{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:650;margin:8px 0 -6px}
 
-.tiles{display:flex;flex-direction:column;gap:12px}
+.tiles{display:flex;flex-direction:column;gap:11px}
+.tiles>*{animation:rise .5s var(--ease) both}
+.tiles>*:nth-child(2){animation-delay:.05s} .tiles>*:nth-child(3){animation-delay:.1s}
+.tiles>*:nth-child(4){animation-delay:.15s} .tiles>*:nth-child(5){animation-delay:.2s}
+.tiles>*:nth-child(6){animation-delay:.25s}
 .tile{
-  display:flex;align-items:center;gap:14px;text-align:left;width:100%;
-  padding:16px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);
-  transition:transform .12s ease,border-color .15s ease;
+  position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;text-align:left;width:100%;
+  padding:14px 15px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  transition:transform .15s var(--ease),border-color .2s;
 }
-.tile:active{transform:scale(.985)}
+.tile::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,var(--c,var(--a)),transparent 55%);opacity:.12}
+.tile:active{transform:scale(.98)}
 .tile .ic{
-  flex:none;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
-  font-size:20px;background:var(--surface2);
+  position:relative;flex:none;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:22px;
+  background:var(--c,var(--surface2));
+  background-image:linear-gradient(145deg,rgba(255,255,255,.3),rgba(0,0,0,.18));
+  box-shadow:0 8px 18px -8px var(--c,transparent);
 }
-.tile .tx{flex:1;min-width:0}
-.tile .tx b{display:block;font-size:16px;font-weight:600}
-.tile .tx span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
-.tile .ar{color:var(--muted);flex:none}
+.tile .tx{position:relative;flex:1;min-width:0}
+.tile .tx b{display:block;font-size:16px;font-weight:700}
+.tile .tx span{display:block;font-size:13px;color:var(--muted);margin-top:1px}
+.tile .ar{position:relative;color:var(--muted);flex:none;font-size:20px;transition:transform .2s var(--ease)}
+.tile:active .ar{transform:translateX(4px)}
 
-.scoreboard{
-  display:flex;gap:10px;align-items:stretch;margin-top:18px;
-}
+.scoreboard{display:flex;gap:10px;align-items:stretch}
 .sb{
-  flex:1;padding:12px;border-radius:14px;border:1px solid var(--line);
-  background:var(--surface);text-align:center;
+  position:relative;overflow:hidden;flex:1;padding:14px 12px 16px;border-radius:18px;
+  border:1px solid var(--line);background:var(--surface);text-align:center;
 }
-.sb span{display:block;font-size:12px;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
-.sb b{display:block;font-size:26px;font-weight:600;margin-top:2px}
-.sb.m b{color:var(--monty)} .sb.p b{color:var(--pia)}
+.sb.m{--pc:var(--a)} .sb.p{--pc:var(--b)}
+.sb::before{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--pc)}
+.sb span{display:block;font-size:12px;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;font-weight:650}
+.sb b{display:block;font-size:32px;font-weight:750;margin-top:2px;color:var(--pc);font-variant-numeric:tabular-nums;line-height:1.15}
+.sb.lead::after{content:"👑";position:absolute;top:8px;right:10px;font-size:15px;animation:pop .5s var(--ease)}
 
 /* ---------- Fragen ---------- */
-.kicker{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
-.kicker.m{color:var(--monty)} .kicker.p{color:var(--pia)}
-.question{font-size:clamp(21px,5.6vw,28px);font-weight:600;line-height:1.3}
+.kicker{
+  align-self:flex-start;padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:var(--surface);
+  font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);
+}
+.kicker.m{color:var(--a);border-color:var(--a)} .kicker.p{color:var(--b);border-color:var(--b)}
+.question{font-size:clamp(22px,6vw,30px);font-weight:700;line-height:1.25;letter-spacing:-.3px}
 .hintline{color:var(--muted);font-size:14px}
 
 .opts{display:flex;flex-direction:column;gap:10px}
+.opts>*{animation:rise .4s var(--ease) both}
+.opts>*:nth-child(2){animation-delay:.06s} .opts>*:nth-child(3){animation-delay:.12s} .opts>*:nth-child(4){animation-delay:.18s}
 .opt{
-  width:100%;padding:16px;border-radius:14px;border:1px solid var(--line);
-  background:var(--surface);text-align:left;font-size:17px;font-weight:500;
+  width:100%;padding:17px 16px;border-radius:16px;border:1px solid var(--line);
+  background:var(--surface);text-align:left;font-size:17px;font-weight:550;
   display:flex;justify-content:space-between;align-items:center;gap:10px;
+  transition:transform .15s var(--ease),border-color .2s,background .2s;
 }
+.opt:active{transform:scale(.98);border-color:var(--fg)}
 .opt.sel{border-color:var(--fg)}
 .opt.right{background:rgba(110,231,183,.14);border-color:var(--good)}
 .opt.wrong{background:rgba(251,113,133,.12);border-color:var(--bad)}
 .opt .who{font-size:12px;color:var(--muted);flex:none}
 
 /* Slider */
-.readout{text-align:center;padding:10px 0}
-.readout b{font-size:clamp(34px,10vw,46px);font-weight:600;letter-spacing:-.5px}
+.readout{text-align:center;padding:6px 0}
+.readout b{font-size:clamp(36px,11vw,50px);font-weight:750;letter-spacing:-1px;font-variant-numeric:tabular-nums}
 .readout span{font-size:16px;color:var(--muted);margin-left:6px}
-input[type=range]{
-  -webkit-appearance:none;width:100%;height:34px;background:transparent;
-}
-input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:var(--surface2)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:36px;background:transparent}
+input[type=range]::-webkit-slider-runnable-track{height:10px;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--b))}
 input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:30px;height:30px;border-radius:50%;margin-top:-11px;
-  background:var(--fg);border:3px solid var(--bg);box-shadow:0 2px 8px rgba(0,0,0,.5);
+  -webkit-appearance:none;width:32px;height:32px;border-radius:50%;margin-top:-11px;
+  background:#fff;border:4px solid var(--bg);box-shadow:0 0 0 2px rgba(255,255,255,.35),0 4px 14px rgba(0,0,0,.6);
 }
+input[type=range]::-moz-range-track{height:10px;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--b))}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:4px solid var(--bg)}
 .range-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
 
 /* Auflösung */
 .truth{
-  text-align:center;padding:20px;border-radius:var(--r);
-  background:var(--surface);border:1px solid var(--line);
+  text-align:center;padding:22px 20px;border-radius:var(--r);
+  background:linear-gradient(var(--bg2),var(--bg2)) padding-box,linear-gradient(135deg,var(--a),var(--b)) border-box;
+  border:1.5px solid transparent;animation:flip .55s var(--ease) both;
 }
-.truth span{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
-.truth b{display:block;font-size:clamp(32px,9vw,44px);font-weight:600;margin-top:4px;letter-spacing:-.5px}
+.truth span{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:650}
+.truth b{display:block;font-size:clamp(32px,9vw,46px);font-weight:750;margin-top:4px;letter-spacing:-.8px;line-height:1.15}
+.truth.text b{font-size:clamp(22px,6.4vw,30px);letter-spacing:-.3px}
 .truth i{display:block;font-style:normal;font-size:13px;color:var(--muted);margin-top:8px;line-height:1.45}
 
 .rows{display:flex;flex-direction:column;gap:10px}
+.rows>*{animation:rise .45s var(--ease) both}
+.rows>*:nth-child(2){animation-delay:.1s}
 .rw{
   display:flex;align-items:center;gap:12px;padding:13px 15px;
-  border-radius:14px;background:var(--surface);border:1px solid var(--line);
+  border-radius:16px;background:var(--surface);border:1px solid var(--line);
 }
-.rw .nm{font-weight:600;flex:none;width:58px}
-.rw.m .nm{color:var(--monty)} .rw.p .nm{color:var(--pia)}
+.rw .nm{font-weight:700;flex:none;min-width:58px}
+.rw.m .nm{color:var(--a)} .rw.p .nm{color:var(--b)}
 .rw .vl{flex:1;min-width:0;font-variant-numeric:tabular-nums}
 .rw .pt{flex:none;font-size:13px;color:var(--muted)}
-.rw.win{border-color:var(--good)}
+.rw.win{border-color:var(--good);background:rgba(110,231,183,.08);box-shadow:0 0 24px -10px var(--good)}
 .rw.win .pt{color:var(--good)}
 
 /* Timer / Erklären */
-.timer{text-align:center;font-size:clamp(46px,15vw,70px);font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-2px}
-.timer.low{color:var(--bad)}
+.ring{position:relative;width:min(44vw,176px);aspect-ratio:1/1;margin:0 auto}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9}
+.ring .trk{stroke:var(--surface2)}
+.ring .prg{stroke:url(#ringGrad);stroke-linecap:round;stroke-dasharray:339.3;transition:stroke-dashoffset .25s linear}
+.ring.low .prg{stroke:var(--bad)}
+.timer{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(44px,13vw,62px);font-weight:750;
+  font-variant-numeric:tabular-nums;letter-spacing:-2px}
+.ring.low .timer{color:var(--bad);animation:pulse 1s ease-in-out infinite}
 .word{
-  text-align:center;font-size:clamp(28px,9vw,42px);font-weight:600;line-height:1.2;
-  padding:34px 14px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line);
-  min-height:150px;display:grid;place-items:center;
+  text-align:center;font-size:clamp(28px,9vw,42px);font-weight:750;line-height:1.2;letter-spacing:-.5px;
+  padding:30px 14px;border-radius:var(--r);min-height:150px;display:grid;place-items:center;word-break:break-word;
+  background:linear-gradient(var(--bg2),var(--bg2)) padding-box,linear-gradient(135deg,var(--a),var(--b)) border-box;
+  border:1.5px solid transparent;
 }
+.word.pop{animation:pop .3s var(--ease)}
 .tally{display:flex;justify-content:center;gap:20px;color:var(--muted);font-size:14px}
 .tally b{color:var(--fg)}
+.tally b.pop{display:inline-block;animation:pop .3s var(--ease)}
 
 /* Knoten */
 .solved{display:flex;flex-direction:column;gap:8px}
-.grp{padding:12px;border-radius:14px;text-align:center;background:var(--surface2);border:1px solid var(--line)}
-.grp b{display:block;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--pia)}
-.grp span{font-size:14px;color:var(--muted)}
+.grp{padding:12px;border-radius:16px;text-align:center;background:var(--gc);color:var(--ink)}
+.grp.new{animation:pop .45s var(--ease) both}
+.grp:nth-child(4n+1){--gc:#ffd166} .grp:nth-child(4n+2){--gc:#7ee0b5}
+.grp:nth-child(4n+3){--gc:#8ab4ff} .grp:nth-child(4n+4){--gc:#d6a6ff}
+.grp b{display:block;font-size:13px;letter-spacing:.6px;text-transform:uppercase;font-weight:800}
+.grp span{font-size:14px;opacity:.8}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
 .cell{
-  aspect-ratio:1/1;border-radius:12px;border:1px solid var(--line);background:var(--surface);
-  font-size:clamp(9px,2.7vw,12px);font-weight:600;line-height:1.15;padding:4px;
+  aspect-ratio:1/1;border-radius:13px;border:1px solid var(--line);background:var(--surface);
+  font-size:clamp(9px,2.7vw,12px);font-weight:700;line-height:1.15;padding:4px;
   display:grid;place-items:center;text-align:center;word-break:break-word;hyphens:auto;
+  transition:transform .15s var(--ease),background .2s;
 }
-.cell.sel{background:var(--fg);color:#140f1d;border-color:var(--fg)}
-.cell.shake{animation:sh .34s}
-@keyframes sh{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.cell:active{transform:scale(.92)}
+.cell.sel{background:linear-gradient(135deg,var(--a),var(--b));color:var(--ink);border-color:transparent;transform:scale(.95)}
+.cell.shake,.tower.shake{animation:sh .4s}
 .lives{display:flex;justify-content:center;gap:7px;align-items:center;color:var(--muted);font-size:13px}
-.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--bad);vertical-align:middle}
-.dot.off{background:var(--line)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--bad);vertical-align:middle;
+  box-shadow:0 0 10px -2px var(--bad);transition:background .3s}
+.dot.off{background:var(--line);box-shadow:none}
 
 /* Turm */
 .tower{display:flex;flex-direction:column-reverse;align-items:center;gap:4px;min-height:120px;justify-content:flex-start}
-.brick{width:min(68%,220px);height:13px;border-radius:5px;background:linear-gradient(90deg,var(--monty),var(--pia));opacity:.9}
-.brick:nth-child(even){width:min(58%,190px)}
+.brick{width:min(68%,220px);height:13px;border-radius:5px;background:linear-gradient(90deg,var(--a),var(--b));
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+.brick:nth-child(even){width:min(58%,190px);background:linear-gradient(90deg,var(--b),var(--a))}
+.brick.new{animation:drop .5s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes drop{from{opacity:0;transform:translateY(-70px) scaleX(.85)}}
 .height{text-align:center}
-.height b{font-size:clamp(40px,12vw,56px);font-weight:600;letter-spacing:-1.5px;display:block;line-height:1}
+.height b{font-size:clamp(42px,12vw,58px);font-weight:750;letter-spacing:-1.5px;display:block;line-height:1;font-variant-numeric:tabular-nums}
 .height span{font-size:13px;color:var(--muted)}
 
-.verdict{text-align:center;font-size:18px;font-weight:600}
+.verdict{text-align:center;font-size:18px;font-weight:700;animation:rise .35s var(--ease) both}
+.verdict:empty{display:none}
 .verdict.ok{color:var(--good)} .verdict.no{color:var(--bad)}
 
-.final{text-align:center}
-.final b{display:block;font-size:clamp(34px,11vw,50px);font-weight:600;letter-spacing:-1px}
-.final span{display:block;color:var(--muted);font-size:14px;margin-top:6px}
-.badge{display:inline-block;margin-top:10px;padding:6px 13px;border-radius:99px;
-  background:rgba(110,231,183,.14);color:var(--good);font-size:13px;font-weight:600}
+.final{text-align:center;animation:pop .6s var(--ease) both}
+.final b{display:block;font-size:clamp(38px,12vw,56px);font-weight:800;letter-spacing:-1.5px;line-height:1.1;
+  background:linear-gradient(100deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.final span{display:block;color:var(--muted);font-size:14px;margin-top:8px}
+.badge{display:inline-block;margin-top:12px;padding:7px 14px;border-radius:99px;
+  background:rgba(110,231,183,.14);color:var(--good);font-size:13px;font-weight:700}
+.badge.dim{background:var(--surface2);color:var(--muted)}
+
+/* Herzblatt */
+.meter{height:12px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.meter i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--b));
+  transition:width 1.4s var(--ease)}
+.hearts{display:flex;justify-content:center;gap:5px;font-size:15px;letter-spacing:1px}
+.hearts .off{opacity:.25;filter:grayscale(1)}
+
+/* Konfetti */
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.confetti i{position:absolute;top:-16px;width:8px;height:14px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translate3d(var(--dx),110vh,0) rotate(var(--rot))}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
 </style>
 </head>
 <body>
 
-<!-- ======================= START ======================= -->
-<section class="screen on" id="s-home">
-  <div class="center" style="justify-content:flex-start">
+<!-- ======================= WER SPIELT? ======================= -->
+<section class="screen on" id="s-who">
+  <div class="center">
     <div>
-      <div class="wordmark serif"><i>Mont</i><b>opia</b></div>
-      <div class="tagline">Ein Spieleabend für Monty &amp; Pia</div>
+      <div class="wordmark serif">Montopia</div>
+      <div class="tagline">Spieleabend für zwei</div>
+    </div>
+    <div class="who-q">Wer spielt gerade?</div>
+    <div class="pairs" id="pairList"></div>
+  </div>
+</section>
+
+<!-- ======================= START ======================= -->
+<section class="screen" id="s-home">
+  <div class="center" style="justify-content:flex-start;gap:14px">
+    <div class="homehead">
+      <div>
+        <div class="wordmark serif">Montopia</div>
+        <div class="tagline" data-t="Ein Spieleabend für {m} &amp; {p}"></div>
+      </div>
+      <button class="chip" data-go="who">⇄ Wechseln</button>
     </div>
 
+    <div class="label">Abendstand</div>
+    <div class="scoreboard">
+      <div class="sb m" id="sb-m"><span data-t="{m}"></span><b id="sc-m">0</b></div>
+      <div class="sb p" id="sb-p"><span data-t="{p}"></span><b id="sc-p">0</b></div>
+    </div>
+
+    <div class="label">Spiele</div>
     <div class="tiles">
-      <button class="tile" data-go="schaetz-modes">
+      <button class="tile" data-go="schaetz-modes" style="--c:#ff8a5b">
         <span class="ic">🎯</span>
         <span class="tx"><b>Schätzchen</b><span>Schätz-Duell in 5 Spielarten · gegeneinander</span></span>
         <span class="ar">›</span>
       </button>
-      <button class="tile" data-go="erklaer-intro">
+      <button class="tile" data-go="herz-intro" style="--c:#ff5c93">
+        <span class="ic">💞</span>
+        <span class="tx"><b>Herzblatt</b><span>Wie gut kennt ihr euch? · zusammen</span></span>
+        <span class="ar">›</span>
+      </button>
+      <button class="tile" data-go="erklaer-intro" style="--c:#ffc53d">
         <span class="ic">⏱️</span>
-        <span class="tx"><b>Monty erklärt's</b><span>Begriffe gegen die Uhr · zusammen</span></span>
+        <span class="tx"><b data-t="{m} erklärt's"></b><span>Begriffe gegen die Uhr · zusammen</span></span>
         <span class="ar">›</span>
       </button>
-      <button class="tile" data-go="knoten-start">
+      <button class="tile" data-go="knoten-start" style="--c:#3fcfb4">
         <span class="ic">🧶</span>
-        <span class="tx"><b>Pias Knoten</b><span>16 Wörter, 4 geheime Gruppen · zusammen</span></span>
+        <span class="tx"><b data-t="{P} Knoten"></b><span>16 Wörter, 4 geheime Gruppen · zusammen</span></span>
         <span class="ar">›</span>
       </button>
-      <button class="tile" data-go="turm-start">
+      <button class="tile" data-go="turm-start" style="--c:#7c8cff">
         <span class="ic">🧱</span>
-        <span class="tx"><b>Montys Turm</b><span>Wahr oder falsch · zusammen</span></span>
+        <span class="tx"><b data-t="{M} Turm"></b><span>Wahr oder falsch · zusammen</span></span>
         <span class="ar">›</span>
       </button>
-    </div>
-
-    <div class="scoreboard">
-      <div class="sb m"><span>Monty</span><b id="sc-m">0</b></div>
-      <div class="sb p"><span>Pia</span><b id="sc-p">0</b></div>
     </div>
   </div>
   <div class="bottom">
@@ -266,28 +395,35 @@ input[type=range]::-webkit-slider-thumb{
 
 <!-- ======================= ERKLÄREN ======================= -->
 <section class="screen" id="s-erklaer-intro">
-  <div class="topbar"><button class="back" data-go="home">‹</button><h2>Monty erklärt's</h2></div>
+  <div class="topbar"><button class="back" data-go="home">‹</button><h2 data-t="{m} erklärt's"></h2></div>
   <div class="center">
     <div class="question">Zwei Runden à 60 Sekunden.</div>
-    <div class="hintline">
-      Erst erklärt Monty, dann Pia. Wer erklärt, hält das Handy – die andere Person rät.<br><br>
-      Der Begriff selbst, Teile davon und Übersetzungen sind tabu. Reimen gilt nicht.
-    </div>
+    <div class="hintline" data-t="Erst erklärt {m}, dann {p}. Wer erklärt, hält das Handy – die andere Person rät."></div>
+    <div class="hintline">Der Begriff selbst, Teile davon und Übersetzungen sind tabu. Reimen gilt nicht.</div>
     <div class="hintline" id="erk-best"></div>
   </div>
   <div class="bottom">
-    <button class="btn monty big" id="erk-start">Monty beginnt</button>
+    <button class="btn m big" id="erk-start" data-t="{m} beginnt"></button>
   </div>
 </section>
 
 <section class="screen" id="s-erklaer">
   <div class="topbar">
     <button class="back" data-go="home">‹</button>
-    <h2 id="erk-who">Monty erklärt</h2>
+    <h2 id="erk-who"></h2>
     <span class="step" id="erk-round"></span>
   </div>
   <div class="center">
-    <div class="timer" id="erk-timer">60</div>
+    <div class="ring" id="erk-ringBox">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" style="stop-color:var(--a)"/><stop offset="1" style="stop-color:var(--b)"/>
+        </linearGradient></defs>
+        <circle class="trk" cx="60" cy="60" r="54"/>
+        <circle class="prg" id="erk-ring" cx="60" cy="60" r="54"/>
+      </svg>
+      <div class="timer" id="erk-timer">60</div>
+    </div>
     <div class="word" id="erk-word">–</div>
     <div class="tally"><span>Richtig <b id="erk-hit">0</b></span><span>Übersprungen <b id="erk-skip">0</b></span></div>
   </div>
@@ -328,7 +464,7 @@ input[type=range]::-webkit-slider-thumb{
 </section>
 
 <section class="screen" id="s-knoten-end">
-  <div class="topbar"><button class="back" data-go="home">‹</button><h2>Pias Knoten</h2></div>
+  <div class="topbar"><button class="back" data-go="home">‹</button><h2 data-t="{P} Knoten"></h2></div>
   <div class="center">
     <div class="final" id="kn-final"></div>
     <div class="solved" id="kn-reveal"></div>
@@ -343,7 +479,7 @@ input[type=range]::-webkit-slider-thumb{
 <section class="screen" id="s-turm">
   <div class="topbar">
     <button class="back" data-go="home">‹</button>
-    <h2>Montys Turm</h2>
+    <h2 data-t="{M} Turm"></h2>
     <span class="step" id="tu-lives"></span>
   </div>
   <div class="center">
@@ -352,21 +488,40 @@ input[type=range]::-webkit-slider-thumb{
     <div class="question" id="tu-stmt" style="text-align:center">–</div>
     <div class="verdict" id="tu-verdict"></div>
   </div>
-  <div class="bottom" id="tu-foot">
-    <div class="two">
-      <button class="btn pia" id="tu-true">Wahr</button>
-      <button class="btn monty" id="tu-false">Falsch</button>
-    </div>
-  </div>
+  <div class="bottom" id="tu-foot"></div>
 </section>
 
 <section class="screen" id="s-turm-end">
-  <div class="topbar"><button class="back" data-go="home">‹</button><h2>Montys Turm</h2></div>
+  <div class="topbar"><button class="back" data-go="home">‹</button><h2 data-t="{M} Turm"></h2></div>
   <div class="center"><div class="final" id="tu-final"></div></div>
   <div class="bottom">
     <button class="btn primary" id="tu-again">Neuer Turm</button>
     <button class="btn ghost" data-go="home">Zurück zur Übersicht</button>
   </div>
+</section>
+
+<!-- ======================= HERZBLATT ======================= -->
+<section class="screen" id="s-herz-intro">
+  <div class="topbar"><button class="back" data-go="home">‹</button><h2>Herzblatt</h2></div>
+  <div class="center">
+    <div class="question">Wie gut kennt ihr euch?</div>
+    <div class="hintline">Zehn Fragen, abwechselnd. Eine Person beantwortet heimlich eine Frage über sich selbst – die andere tippt, was gewählt wurde.</div>
+    <div class="hintline">Jeder Treffer bringt einen Herzpunkt fürs Team. Und wenn's daneben geht: kurz erzählen, warum. Genau da wird's spannend.</div>
+    <div class="hintline" id="hz-best"></div>
+  </div>
+  <div class="bottom">
+    <button class="btn primary big" id="hz-start">Los geht's</button>
+  </div>
+</section>
+
+<section class="screen" id="s-herz">
+  <div class="topbar">
+    <button class="back" data-go="home">‹</button>
+    <h2>Herzblatt</h2>
+    <span class="step" id="hz-step"></span>
+  </div>
+  <div class="center" id="hz-body"></div>
+  <div class="bottom" id="hz-foot"></div>
 </section>
 
 <script>
@@ -708,7 +863,109 @@ const FACTS = [
 ["Wie lange blieben die Apollo-11-Astronauten auf dem Mond?","Apollo 11 auf dem Mond",21,"Stunden","Weltall"],
 ["Wie lange dauert ein Tag auf dem Mars?","Marstag",24.6,"Stunden","Weltall"],
 
-["Wie oft schlägt das Herz eines Kolibris im Flug pro Minute?","Kolibriherz",1200,"Schläge/Min.","Tiere"]
+["Wie oft schlägt das Herz eines Kolibris im Flug pro Minute?","Kolibriherz",1200,"Schläge/Min.","Tiere"],
+
+["Wie hoch ist der Olympiaturm in München?","Olympiaturm",291,"m","Bauwerke"],
+["Wie hoch ist die Kuppel des Petersdoms in Rom?","Petersdom",137,"m","Bauwerke"],
+["Wie lang ist die Golden Gate Bridge insgesamt?","Länge der Golden Gate Bridge",2737,"m","Bauwerke"],
+["Wie lang ist ein ICE 4 mit 13 Wagen?","ICE 4",374,"m","Alltag"],
+["Wie hoch ist der Fuji?","Fuji",3776,"m","Natur"],
+["Wie hoch ist der Aconcagua, der höchste Berg Amerikas?","Aconcagua",6961,"m","Natur"],
+["Wie hoch ist der Vesuv?","Vesuv",1281,"m","Natur"],
+["Wie tief ist der Grand Canyon an der tiefsten Stelle?","Grand Canyon",1800,"m","Natur"],
+["Wie hoch ist Hyperion, der höchste bekannte Baum der Welt?","Hyperion",116,"m","Natur"],
+["Wie tief ist die Ostsee im Durchschnitt?","Ostsee",52,"m","Natur"],
+["Wie lang ist ein olympisches Schwimmbecken?","Olympiabecken",50,"m","Sport"],
+["Wie breit ist ein Fußballtor?","Breite eines Fußballtors",7.32,"m","Sport"],
+["Wie hoch ist ein Fußballtor?","Höhe eines Fußballtors",2.44,"m","Sport"],
+["Wie lang ist ein Tennisplatz?","Länge eines Tennisplatzes",23.77,"m","Sport"],
+["Wie weit ist der Elfmeterpunkt von der Torlinie entfernt?","Elfmeterpunkt",11,"m","Sport"],
+
+["Wie lang ist der Gotthard-Basistunnel?","Gotthard-Basistunnel",57,"km","Bauwerke"],
+["Wie lang ist der Eurotunnel unter dem Ärmelkanal?","Eurotunnel",50,"km","Bauwerke"],
+["Wie lang ist der Amazonas?","Amazonas",6400,"km","Geografie"],
+["Wie lang ist die Seine?","Seine",777,"km","Geografie"],
+["Wie lang ist die Spree?","Spree",400,"km","Geografie"],
+["Wie lang ist die Grenze zwischen den USA und Kanada?","Grenze USA–Kanada",8891,"km","Geografie"],
+["Wie weit ist Hamburg von München Luftlinie entfernt?","Hamburg–München",612,"km","Geografie"],
+["Wie lang ist ein Ironman-Triathlon insgesamt?","Ironman",226,"km","Sport"],
+["Wie viele Kilometer fährt ein Auto in Deutschland im Schnitt pro Jahr?","Fahrleistung pro Auto",12500,"km","Alltag"],
+["Wie groß ist der Durchmesser des Mars?","Durchmesser des Mars",6779,"km","Weltall"],
+["Wie groß ist der Durchmesser des Jupiter?","Durchmesser des Jupiter",139820,"km","Weltall"],
+
+["Wie weit ist der Jupiter im Mittel von der Sonne entfernt?","Jupiter–Sonne",778,"Mio. km","Weltall"],
+["Wie nah kommt uns die Venus mindestens?","Erde–Venus",38,"Mio. km","Weltall"],
+["Wie viele Erdtage dauert ein Jahr auf dem Mars?","Marsjahr",687,"Tage","Weltall"],
+["Wie heiß ist es auf der Oberfläche der Venus?","Venusoberfläche",465,"°C","Weltall"],
+["Wie lange braucht Licht vom Mond zur Erde?","Mondlicht zur Erde",1.3,"Sekunden","Weltall"],
+["Wie viele Monde hat der Mars?","Marsmonde",2,"Stück","Weltall"],
+["Wie viele Menschen sind bisher auf dem Mond gelaufen?","Menschen auf dem Mond",12,"Stück","Weltall"],
+
+["Wie schwer wird ein Blauwal?","Gewicht eines Blauwals",150000,"kg","Tiere"],
+["Wie schwer wird ein Gorilla-Männchen?","Gorilla",180,"kg","Tiere"],
+["Wie schwer ist ein Laib Parmigiano Reggiano?","Laib Parmesan",40,"kg","Essen"],
+["Wie viele Stacheln hat ein Igel ungefähr?","Igelstacheln",7000,"Stück","Tiere"],
+["Wie viele Beine hat ein Hummer?","Hummerbeine",10,"Stück","Tiere"],
+["Wie lang ist die Zunge einer Giraffe?","Giraffenzunge",50,"cm","Tiere"],
+["Wie schnell schwimmt ein Eselspinguin höchstens?","Eselspinguin",36,"km/h","Tiere"],
+["Wie schnell fliegt eine Stubenfliege?","Stubenfliege",7,"km/h","Tiere"],
+["Wie viele Stunden schläft eine Hauskatze pro Tag?","Schlaf einer Katze",15,"Stunden","Tiere"],
+["Wie alt können Riesenschildkröten werden?","Riesenschildkröte",150,"Jahre","Tiere"],
+["Wie lange trägt eine Stute ihr Fohlen aus?","Tragzeit Pferd",11,"Monate","Tiere"],
+
+["Wie oft blinzelt ein Mensch ungefähr pro Minute?","Blinzeln pro Minute",15,"mal","Körper"],
+["Wie viele Rippen hat ein Mensch?","Rippen",24,"Stück","Körper"],
+["Wie viele Milchzähne hat ein Kind?","Milchzähne",20,"Stück","Körper"],
+["Wie schwer ist ein menschliches Herz?","Menschliches Herz",300,"g","Körper"],
+["Wie schwer ist eine menschliche Leber?","Menschliche Leber",1500,"g","Körper"],
+["Wie viel Speichel bildet ein Mensch pro Tag?","Speichel pro Tag",1.5,"Liter","Körper"],
+
+["Wie viele Kalorien hat ein Big Mac?","Big Mac",500,"kcal","Essen"],
+["Wie viele Kalorien stecken in 100 Gramm Gummibärchen?","100 g Gummibärchen",340,"kcal","Essen"],
+["Wie viel Koffein steckt in einer 250-ml-Dose Energydrink?","Dose Energydrink",80,"mg","Essen"],
+["Wie viele Liter Milch braucht man für ein Kilo Butter?","Milch für 1 kg Butter",20,"Liter","Essen"],
+["Wie viele Liter Milch braucht man für ein Kilo Gouda?","Milch für 1 kg Gouda",10,"Liter","Essen"],
+["Wie viel Wasser steckt rechnerisch in der Herstellung einer Tasse Kaffee?","Wasser für eine Tasse Kaffee",140,"Liter","Essen"],
+
+["Wie schwer darf ein Golfball höchstens sein?","Golfball",45.9,"g","Sport"],
+["Wie schwer ist eine 1-Euro-Münze?","1-Euro-Münze",7.5,"g","Alltag"],
+["Wie lang ist ein DIN-A4-Blatt?","DIN-A4-Blatt",29.7,"cm","Alltag"],
+
+["Wie viele Spieler einer Rugby-Mannschaft stehen auf dem Feld?","Rugby",15,"Stück","Sport"],
+["Wie viele Punkte bringt ein Touchdown im American Football?","Touchdown",6,"Stück","Sport"],
+["Wie viele farbige Flächen hat ein Zauberwürfel?","Zauberwürfel-Flächen",54,"Stück","Kultur"],
+["Wie viele Stufen hat der Eiffelturm bis zur Spitze?","Stufen im Eiffelturm",1665,"Stück","Bauwerke"],
+["Wie viele Stufen führen im Kölner Dom auf die Aussichtsplattform?","Stufen im Kölner Dom",533,"Stück","Bauwerke"],
+["Wie viele Zeichen durfte ein Tweet ursprünglich haben?","Tweet",140,"Stück","Alltag"],
+["Wie viele Zeichen hat eine deutsche IBAN?","IBAN",22,"Stück","Alltag"],
+["Wie viele Länder grenzen an Deutschland?","Nachbarländer Deutschlands",9,"Stück","Geografie"],
+["Wie viele Hauptstädte hat Südafrika?","Hauptstädte Südafrikas",3,"Stück","Geografie"],
+["Wie viele Inseln hat Griechenland ungefähr?","Griechische Inseln",6000,"Stück","Geografie"],
+
+["Wie lang ist Der Herr der Ringe: Die Rückkehr des Königs im Kino?","Rückkehr des Königs",201,"Minuten","Kultur"],
+["Wie lang ist der Film Forrest Gump?","Forrest Gump",142,"Minuten","Kultur"],
+["Wie lang ist Der König der Löwen von 1994?","König der Löwen",88,"Minuten","Kultur"],
+["Wie lang ist Kevin – Allein zu Haus?","Kevin – Allein zu Haus",103,"Minuten","Kultur"],
+
+["Wie viele Menschen leben auf der Erde?","Weltbevölkerung",8.2,"Mrd.","Geografie"],
+["Wie viele Menschen leben in Köln?","Einwohner Kölns",1.1,"Mio.","Geografie"],
+["Wie viele Menschen leben in Paris ohne Vororte?","Einwohner von Paris",2.1,"Mio.","Geografie"],
+["Wie viele Menschen leben in New York City?","Einwohner New Yorks",8.3,"Mio.","Geografie"],
+["Wie groß ist Mallorca?","Fläche Mallorcas",3640,"km²","Geografie"],
+["Wie groß ist Rügen?","Fläche Rügens",926,"km²","Geografie"],
+["Wie groß ist das Saarland?","Fläche des Saarlands",2570,"km²","Geografie"],
+
+["In welchem Jahr kam der erste Harry-Potter-Band heraus?","Erster Harry-Potter-Band",1997,"Jahr","Kultur",[1900,2030]],
+["In welchem Jahr lief der erste Tatort?","Erster Tatort",1970,"Jahr","Kultur",[1900,2030]],
+["In welchem Jahr starb Elvis Presley?","Tod von Elvis",1977,"Jahr","Kultur",[1900,2030]],
+["In welchem Jahr fand die deutsche Wiedervereinigung statt?","Wiedervereinigung",1990,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr wurde der Euro als Bargeld eingeführt?","Euro-Bargeld",2002,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr wurde Deutschland zuletzt Fußball-Weltmeister der Männer?","WM-Titel in Brasilien",2014,"Jahr","Sport",[1900,2030]],
+["In welchem Jahr ging Facebook online?","Start von Facebook",2004,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr ereignete sich das Reaktorunglück von Tschernobyl?","Tschernobyl",1986,"Jahr","Geschichte",[1900,2030]],
+["In welchem Jahr wurde Mozart geboren?","Geburt Mozarts",1756,"Jahr","Geschichte",[1500,2030]],
+["In welchem Jahr wurde der Eiffelturm eröffnet?","Eröffnung des Eiffelturms",1889,"Jahr","Geschichte",[1500,2030]],
+["In welchem Jahr veröffentlichte Luther seine 95 Thesen?","Luthers Thesen",1517,"Jahr","Geschichte",[1000,2030]]
 ].map(a => ({q:a[0], l:a[1], v:a[2], u:a[3], c:a[4], r:a[5]}));
 
 /* [Aussage, 1=wahr, Erklärung] */
@@ -762,7 +1019,7 @@ const WF = [
 ["Giraffen haben mehr Halswirbel als Menschen.",0,"Beide haben sieben – die der Giraffe sind länger."],
 ["Bei Seepferdchen trägt das Männchen den Nachwuchs aus.",1,"In einer Bruttasche am Bauch."],
 ["Delfine schlafen immer nur mit einer Gehirnhälfte.",1,"Die andere hält sie am Atmen."],
-["Elefanten können nicht springen.",0,"Richtig – sie können es tatsächlich nicht."],
+["Elefanten können nicht springen.",1,"Stimmt – sie heben nie alle vier Beine gleichzeitig vom Boden."],
 ["Kängurus können nicht rückwärts gehen.",1,"Schwanz und Beinbau lassen es nicht zu."],
 ["Waschbären waschen ihr Futter.",0,"Sie betasten es im Wasser, um es zu erfühlen."],
 ["Die Farbe Orange wurde nach der Frucht benannt.",1,"Vorher sagte man im Deutschen gelbrot."],
@@ -923,7 +1180,84 @@ const WF = [
 ["Sternbilder sind räumlich zusammengehörige Sterngruppen.",0,"Sie sehen nur von der Erde aus so aus."],
 ["Licht von manchen sichtbaren Sternen ist älter als die Menschheit.",1,"Es war tausende Jahre unterwegs."],
 ["Man altert im Weltall minimal langsamer als auf der Erde.",1,"Relativistischer Effekt, messbar bei ISS-Astronauten."],
-["Astronauten werden im Weltall etwas größer.",1,"Die Wirbelsäule dehnt sich ohne Schwerkraft."]
+["Astronauten werden im Weltall etwas größer.",1,"Die Wirbelsäule dehnt sich ohne Schwerkraft."],
+
+["Ein Faultier kann länger die Luft anhalten als ein Delfin.",1,"Bis zu 40 Minuten – es senkt dabei seinen Herzschlag stark."],
+["Kraken haben blaues Blut.",1,"Ihr Blutfarbstoff Hämocyanin enthält Kupfer."],
+["Ein Straußenauge ist größer als sein Gehirn.",1,"Jedes Auge ist größer als das Gehirn des Vogels."],
+["Seeotter halten beim Schlafen manchmal Händchen.",1,"So treiben sie nicht auseinander."],
+["Das Schnabeltier legt Eier.",1,"Als eines von ganz wenigen Säugetieren."],
+["Alle Haie müssen ständig schwimmen, um nicht zu ersticken.",0,"Das gilt nur für einige Arten – viele können am Boden ruhen."],
+["Wombats hinterlassen würfelförmigen Kot.",1,"Ihr Darm formt ihn tatsächlich so."],
+["Große Pandas ernähren sich fast nur von Bambus.",1,"Zu rund 99 Prozent."],
+["Libellen gab es schon vor den Dinosauriern.",1,"Ihre Vorfahren flogen vor über 300 Millionen Jahren."],
+["Pferde können im Stehen dösen.",1,"Ein Mechanismus in den Beinen hält sie dabei aufrecht."],
+["Der Mensch ist das einzige Lebewesen mit einem echten Kinn.",1,"Nicht einmal Neandertaler hatten eins."],
+["Krähen merken sich die Gesichter von Menschen.",1,"Und warnen ihre Artgenossen vor unfreundlichen."],
+["Gorillas sind die nächsten Verwandten des Menschen.",0,"Schimpansen und Bonobos stehen uns näher."],
+["Nur weibliche Stechmücken stechen.",1,"Sie brauchen das Blut für ihre Eier."],
+["Ein Regenwurm hat mehrere Herzen.",1,"Fünf Paar pumpende Gefäßbögen."],
+["Der Tukan hat einen schweren, massiven Schnabel.",0,"Er ist leicht und innen wabenartig hohl."],
+["Der Mensch hat mehr als fünf Sinne.",1,"Gleichgewicht, Temperatur, Schmerz und Körperlage kommen dazu."],
+["Das Herz bleibt beim Niesen kurz stehen.",0,"Es schlägt weiter – nur der Rhythmus ändert sich minimal."],
+["Haare und Nägel wachsen nach dem Tod weiter.",0,"Die Haut zieht sich zurück und lässt sie länger wirken."],
+["Im menschlichen Körper steckt Eisen für einen kleinen Nagel.",1,"Rund drei bis vier Gramm."],
+["Die Hornhaut des Auges hat keine Blutgefäße.",1,"Sie bekommt Sauerstoff direkt aus der Luft."],
+["Etwa ein Viertel der Menschen sind Linkshänder.",0,"Es sind ungefähr zehn Prozent."],
+["Männer haben eine Rippe weniger als Frauen.",0,"Beide haben normalerweise 24 Rippen."],
+["Der Mount Everest wächst noch jedes Jahr ein paar Millimeter.",1,"Die indische Platte schiebt weiter nach Norden."],
+["Die Sahara ist die größte Wüste der Welt.",0,"Die Antarktis ist größer – auch sie zählt als Wüste."],
+["Kanada hat die längste Küstenlinie der Welt.",1,"Dank unzähliger Inseln mit großem Abstand."],
+["Im Toten Meer geht man nicht unter.",1,"Das Wasser ist rund zehnmal salziger als normales Meerwasser."],
+["Der Rhein berührt sechs Länder.",1,"Schweiz, Liechtenstein, Österreich, Deutschland, Frankreich, Niederlande."],
+["Berlin liegt weiter östlich als Wien.",0,"Wien liegt rund drei Längengrade weiter östlich."],
+["Rom liegt nördlicher als New York.",1,"Knapp – aber es stimmt."],
+["Afrika ist größer als die USA, China und Indien zusammen.",1,"Gewohnte Weltkarten lassen Afrika zu klein wirken."],
+["Die Schweiz hat vier Landessprachen.",1,"Deutsch, Französisch, Italienisch und Rätoromanisch."],
+["In Neuseeland leben mehr Schafe als Menschen.",1,"Rund fünfmal so viele."],
+["Der Mond entfernt sich jedes Jahr ein Stück von der Erde.",1,"Etwa 3,8 Zentimeter pro Jahr."],
+["Ein Erdtag wird über Jahrmillionen länger.",1,"Die Gezeiten bremsen die Erddrehung."],
+["Der Mars ist rot, weil sein Staub rostet.",1,"Eisenoxid färbt die Oberfläche."],
+["Auf der ISS sieht man etwa 16 Sonnenaufgänge pro Tag.",1,"Sie umrundet die Erde alle 90 Minuten."],
+["Jupiter hat mehr bekannte Monde als jeder andere Planet.",0,"Der Saturn hat inzwischen deutlich mehr."],
+["Sterne funkeln, weil sie flackern.",0,"Die unruhige Erdatmosphäre lässt sie funkeln."],
+["Die Erde ist der Sonne im Januar näher als im Juli.",1,"Die Jahreszeiten entstehen durch die Neigung der Erdachse."],
+["Es gibt auch Regenbögen in der Nacht.",1,"Bei hellem Vollmond – als Mondregenbogen."],
+["Wolken sind leicht, weil sie kaum Wasser enthalten.",0,"Eine Haufenwolke wiegt oft Hunderte Tonnen."],
+["In der Antarktis gibt es keine einheimischen Landsäugetiere.",1,"Robben und Wale leben im Meer."],
+["Glas ist eine sehr langsam fließende Flüssigkeit.",0,"Alte Fenster sind nur ungleichmäßig hergestellt."],
+["Diamanten bestehen aus Kohlenstoff.",1,"Wie Graphit in der Bleistiftmine."],
+["Gold ist magnetisch.",0,"Ein Magnet zieht reines Gold nicht an."],
+["Die Zahl Pi endet irgendwann.",0,"Sie hat unendlich viele Nachkommastellen ohne Muster."],
+["Thomas Edison hat die Glühbirne allein erfunden.",0,"Er verbesserte vorhandene Entwürfe entscheidend."],
+["Die Mona Lisa hat keine sichtbaren Augenbrauen.",1,"Ob sie je welche hatte, ist umstritten."],
+["Van Gogh verkaufte zu Lebzeiten nur sehr wenige Bilder.",1,"Sicher belegt ist ein einziger Verkauf."],
+["Mozart wurde in Wien geboren.",0,"Geboren wurde er in Salzburg."],
+["Beethoven komponierte noch, als er schon taub war.",1,"Auch die Neunte Sinfonie."],
+["Wikinger trugen Hörner an ihren Helmen.",0,"Eine Erfindung des 19. Jahrhunderts."],
+["Im Mittelalter hielten Gelehrte die Erde für eine Scheibe.",0,"Dass sie rund ist, war längst bekannt."],
+["Die ersten Olympischen Spiele der Neuzeit fanden in Athen statt.",1,"Im Jahr 1896."],
+["Die krumme Marathonstrecke von 42,195 km stammt aus London.",1,"Von den Olympischen Spielen 1908."],
+["Golfbälle haben Dellen, damit sie weiter fliegen.",1,"Die Dellen verringern den Luftwiderstand."],
+["Ein klassischer Fußball besteht aus 32 Flächen.",1,"12 Fünfecke und 20 Sechsecke."],
+["Schach ist eine olympische Sportart.",0,"Vom IOC anerkannt, aber nicht im Programm."],
+["Popcorn platzt, weil Wasser im Korn verdampft.",1,"Der Dampf sprengt die harte Hülle."],
+["Rote Paprika enthält mehr Vitamin C als Zitronen.",1,"Etwa doppelt bis dreimal so viel."],
+["Ananas wachsen an Bäumen.",0,"Sie wachsen am Boden aus einer Staude."],
+["Kiwis stammen ursprünglich aus Neuseeland.",0,"Sie kommen aus China."],
+["Weißwein kann auch aus roten Trauben gemacht werden.",1,"Der Saft ist hell – die Farbe steckt in der Schale."],
+["Die deutsche Schaumweinsteuer finanzierte einst die Kriegsflotte.",1,"Eingeführt 1902 – und es gibt sie bis heute."],
+["Gummibärchen wurden in Bonn erfunden.",1,"1922 von Hans Riegel – daher Haribo."],
+["Fanta wurde in Deutschland erfunden.",1,"Im Zweiten Weltkrieg, als Cola-Sirup fehlte."],
+["Der Teddybär ist nach einem US-Präsidenten benannt.",1,"Nach Theodore „Teddy“ Roosevelt."],
+["Lego kommt aus Schweden.",0,"Aus Dänemark."],
+["Der erste Adventskranz hatte 24 Kerzen.",1,"Johann Hinrich Wichern, 1839 in Hamburg."],
+["Der Weihnachtsmann trägt Rot wegen einer Coca-Cola-Werbung.",0,"Rot trug er schon vorher – die Werbung machte es nur berühmt."],
+["Alle vier Jahre gibt es ausnahmslos ein Schaltjahr.",0,"Volle Jahrhunderte zählen nur, wenn sie durch 400 teilbar sind."],
+["Es gab schon einmal einen 30. Februar.",1,"In Schweden im Jahr 1712."],
+["Elektroautos gab es schon vor über 100 Jahren.",1,"Um 1900 fuhren in den USA mehr E-Autos als Benziner."],
+["Ein Kilo Federn ist leichter als ein Kilo Eisen.",0,"Beides wiegt genau ein Kilo."],
+["Deutsch ist die häufigste Muttersprache in der EU.",1,"Noch vor Französisch und Italienisch."]
 ].map(a => ({s:a[0], w:!!a[1], e:a[2]}));
 
 const TERMS = [
@@ -985,7 +1319,32 @@ const TERMS = [
 "Schneeballschlacht","Drachensteigen","Lagerfeuer","Stockbrot",
 "Morgentau","Abendrot","Windstille","Bergnebel","Gezeiten","Ebbe","Flut","Dünung","Treibholz","Korallenriff",
 "Vulkanausbruch","Erdbeben","Geysir","Polarlicht","Milchstraße","Mondsichel","Gewitterwolke","Hagelkorn",
-"Raureif","Schmelzwasser","Tropfsteinhöhle","Moorlandschaft","Steppe","Urwald"
+"Raureif","Schmelzwasser","Tropfsteinhöhle","Moorlandschaft","Steppe","Urwald",
+
+"Toaster","Wasserkocher","Eierbecher","Topflappen","Brotkorb","Pfeffermühle","Teesieb","Backofen",
+"Mikrowelle","Bettlaken","Kopfkissen","Wärmflasche","Badeente","Klobürste","Rauchmelder","Lichtschalter",
+"Steckerleiste","Glühbirne","Sofakissen","Teppich","Vorhang","Blumentopf","Kehrblech","Wischmopp",
+"Brezel","Currywurst","Döner","Sushi","Tiramisu","Kartoffelpuffer","Lebkuchen","Zimtschnecke","Bratapfel",
+"Pommes","Milchreis","Waffel","Schwarzwälder Kirschtorte","Leberkäse","Maultaschen","Flammkuchen",
+"Obstsalat","Smoothie","Glühwein","Raclette",
+"Krokodil","Nashorn","Schildkröte","Eisbär","Delfin","Kranich","Pfau","Eule","Hamster","Meerschweinchen",
+"Goldfisch","Ameise","Spinne","Schnecke","Möwe","Elch","Pelikan","Tukan","Wombat","Kolibri",
+"Kino","Bäckerei","Apotheke","Spielplatz","Freibad","Jugendherberge","Campingplatz","Hochhaus","Achterbahn",
+"Riesenrad","Kreuzfahrtschiff","Wochenmarkt","Flohmarkt","Bushaltestelle","U-Bahn","Fitnessstudio",
+"Waschsalon","Sauna","Kloster","Leuchtreklame",
+"Polizist","Lehrerin","Koch","Astronaut","Detektiv","Fotograf","Elektriker","Klempner","Briefträger",
+"Clown","Zauberer","Kapitän","Busfahrer","Florist","Metzger","Tätowierer","Influencer","Hausmeister",
+"Brettspiel","Puzzle","Kreuzworträtsel","Schatzsuche","Versteckspiel","Seifenblase","Luftballon","Sandburg",
+"Schneemann","Kissenschlacht","Pyjamaparty","Escape Room","Fotoalbum","Selfie","Liebesbrief","Postkarte",
+"Tagebuch","Hörbuch","Quizshow","Talentshow",
+"Glück","Liebe auf den ersten Blick","Morgenmuffel","Frühjahrsmüdigkeit","Kater","Gänsehaut",
+"Schmetterlinge im Bauch","Bauchgefühl","Tagtraum","Lachanfall","Wutanfall","Mut","Ehrgeiz","Faulheit",
+"Hoffnung","Fernbeziehung","Flitterwochen","Jahrestag","Heiratsantrag","Kuss",
+"Smartphone","Staubsaugerroboter","Smartwatch","Virtuelle Realität","Künstliche Intelligenz","Flugmodus",
+"WLAN-Passwort","Screenshot","Videoanruf","QR-Code","Funkloch","Sprachassistent","Werbeblocker","Hashtag",
+"Sonnenaufgang","Sonnenuntergang","Regentropfen","Pfütze","Tornado","Hitzewelle","Kleeblatt","Kastanie",
+"Tannenzapfen","Seerose","Sonnenblume","Kaktus","Fliegenpilz","Muschel","Insel","Gletscher","Vulkan",
+"Höhle","Wüste","Oase"
 ];
 
 /* Jede Gruppe: [Überschrift, 4 Wörter] */
@@ -1126,7 +1485,180 @@ const KNOTEN = [
   ["Am Himmel","Mond","Stern","Planet","Komet"],
   ["Vorm Schlafen","Gutenachtgeschichte","Zähneputzen","Wecker stellen","Licht aus"],
   ["Abendprogramm","Tatort","Tagesschau","Talkshow","Spielfilm"],
-  ["Kneipenabend","Bierdeckel","Dartscheibe","Tresen","Zapfhahn"]]}
+  ["Kneipenabend","Bierdeckel","Dartscheibe","Tresen","Zapfhahn"]]},
+
+{t:"Ab ins Wasser", g:[
+  ["Wassersport","Surfen","Segeln","Rudern","Tauchen"],
+  ["Boot","Kanu","Jolle","Floß","Kutter"],
+  ["Meeresbewohner","Seestern","Muschel","Garnele","Robbe"],
+  ["Im Freibad","Bademeister","Sprungturm","Liegewiese","Pommesbude"]]},
+
+{t:"Mit Herz", g:[
+  ["Beginnt mit Herz","Herzschlag","Herzblatt","Herzklopfen","Herzenswunsch"],
+  ["Kosename","Schatz","Hase","Maus","Spatz"],
+  ["Valentinstag","Rosen","Pralinen","Karte","Candlelight"],
+  ["Hochzeit","Ringe","Brautstrauß","Schleier","Trauzeuge"]]},
+
+{t:"Rund ums Auto", g:[
+  ["Automarke","Opel","Skoda","Fiat","Volvo"],
+  ["Im Kofferraum","Warndreieck","Verbandskasten","Ersatzrad","Wagenheber"],
+  ["Verkehrszeichen","Vorfahrt","Einbahnstraße","Stoppschild","Halteverbot"],
+  ["Im Motor","Kolben","Zündkerze","Kurbelwelle","Ventil"]]},
+
+{t:"Weltreise", g:[
+  ["Hauptstadt in Asien","Tokio","Seoul","Bangkok","Hanoi"],
+  ["Währung","Yen","Dollar","Pfund","Franken"],
+  ["Neues Weltwunder","Kolosseum","Taj Mahal","Petra","Machu Picchu"],
+  ["Reisedokument","Visum","Reisepass","Bordkarte","Impfpass"]]},
+
+{t:"Schöne Bescherung", g:[
+  ["Am Weihnachtsbaum","Kugel","Lametta","Strohstern","Lichterkette"],
+  ["Plätzchen & Co.","Zimtstern","Vanillekipferl","Spekulatius","Dominostein"],
+  ["In der Krippe","Ochse","Esel","Hirte","Engel"],
+  ["Heiligabend","Bescherung","Christmette","Kartoffelsalat","Geschenkpapier"]]},
+
+{t:"Wochenmarkt", g:[
+  ["Obst","Pflaume","Birne","Aprikose","Kirsche"],
+  ["Gemüse","Lauch","Sellerie","Kohlrabi","Rettich"],
+  ["Blume","Tulpe","Nelke","Dahlie","Lilie"],
+  ["Käse","Emmentaler","Bergkäse","Ziegenkäse","Tilsiter"]]},
+
+{t:"Kinderzimmer", g:[
+  ["Spielzeug","Kreisel","Murmel","Jojo","Bauklotz"],
+  ["Kinderserie","Sesamstraße","Biene Maja","Heidi","Pumuckl"],
+  ["Gute-Nacht-Ritual","Schlaflied","Kuscheltier","Nachtlicht","Vorlesen"],
+  ["Spielplatz","Rutsche","Schaukel","Wippe","Sandkasten"]]},
+
+{t:"Tierisch verwirrend", g:[
+  ["Steckt ein Tier drin","Hamsterkauf","Bärenhunger","Katzenjammer","Eselsbrücke"],
+  ["Automodell","Käfer","Mustang","Panda","Puma"],
+  ["Sportmarke","Adidas","Nike","Reebok","Asics"],
+  ["Schachfigur","Springer","Läufer","Turm","Dame"]]},
+
+{t:"Ganz schön kalt", g:[
+  ["Wintersport","Rodeln","Biathlon","Curling","Eisschnelllauf"],
+  ["Gegen die Kälte","Handschuhe","Schal","Mütze","Stiefel"],
+  ["Eis am Stiel","Magnum","Capri","Nogger","Flutschfinger"],
+  ["Eisige Gegend","Arktis","Sibirien","Grönland","Spitzbergen"]]},
+
+{t:"Im Büro", g:[
+  ["Büro-Denglisch","Deadline","Feedback","Call","Meeting"],
+  ["Büromöbel","Rollcontainer","Schreibtisch","Aktenschrank","Drehstuhl"],
+  ["Hier macht man Pause","Kaffeeküche","Kantine","Raucherecke","Pausenraum"],
+  ["Taste","Enter","Escape","Shift","Leertaste"]]},
+
+{t:"Sternstunde", g:[
+  ["Sternbild","Orion","Kassiopeia","Pegasus","Andromeda"],
+  ["Raumfahrt","Rakete","Astronaut","Raumstation","Countdown"],
+  ["Mondphase","Neumond","Vollmond","Halbmond","Sichel"],
+  ["Science-Fiction","Star Trek","Alien","Interstellar","Dune"]]},
+
+{t:"Feierabend", g:[
+  ["Cocktail","Hugo","Mojito","Caipirinha","Daiquiri"],
+  ["Hinter der Bar","Shaker","Strohhalm","Stößel","Barmaß"],
+  ["Kneipenspiel","Darts","Kicker","Billard","Flipper"],
+  ["Musikrichtung","Rock","Techno","Schlager","Hip-Hop"]]},
+
+{t:"Von Kopf bis Fuß", g:[
+  ["Beginnt mit Kopf","Kopfkissen","Kopfsalat","Kopfstand","Kopfhörer"],
+  ["Endet auf Fuß","Plattfuß","Barfuß","Gänsefuß","Hasenfuß"],
+  ["Beginnt mit Hand","Handtuch","Handschuh","Handbremse","Handwerk"],
+  ["Beginnt mit Bauch","Bauchgefühl","Bauchnabel","Bauchladen","Bauchredner"]]}
+];
+
+/* Herzblatt: [Thema, Antwort A, Antwort B] – eine Person wählt für sich, die andere rät */
+const HERZ = [
+["Der perfekte Sonntag","Ausschlafen und Brunch","Früh raus und Ausflug"],
+["Traumurlaub","Strand und Meer","Berge und Wandern"],
+["Am Morgen lieber","Kaffee","Tee"],
+["Freitagabend","Gemütlich auf dem Sofa","Unterwegs mit Freunden"],
+["Nach einem Streit brauche ich eher…","Sofort reden","Erst mal Abstand"],
+["Mehr Energie gibt mir…","Zeit für mich allein","Zeit mit anderen"],
+["Snack-Laune","Süß","Salzig"],
+["Filmabend","Komödie","Thriller"],
+["Geschenke","Lieber überrascht werden","Lieber etwas von der Wunschliste"],
+["Ich bin eher…","Frühaufsteher","Nachteule"],
+["Auf Reisen","Alles vorher planen","Spontan treiben lassen"],
+["Lieber…","Hund","Katze"],
+["Für immer verzichten auf…","Schokolade","Käse"],
+["Superkraft","Fliegen können","Gedanken lesen"],
+["Bei Stress hilft mir eher…","Bewegung","Ruhe"],
+["Wohnen","Mitten in der Stadt","Haus auf dem Land"],
+["Zeitreise","In die Vergangenheit","In die Zukunft"],
+["Zuneigung zeige ich eher durch…","Worte","Taten"],
+["Gemeinsamer Abend","Brettspiele","Serienmarathon"],
+["Im Restaurant","Mein bewährtes Lieblingsgericht","Immer etwas Neues"],
+["Jahreszeit","Sommer","Winter"],
+["Bei traurigen Filmen…","Weine ich öfter, als ich zugebe","Bleibe ich meist cool"],
+["Wenn ich krank bin, will ich…","Umsorgt werden","Meine Ruhe"],
+["Italienisch","Pizza","Pasta"],
+["Ein freier Tag ganz ohne Plan ist…","Purer Luxus","Ein bisschen verschenkt"],
+["Konzert","Große Arena-Show","Kleiner Club-Gig"],
+["Beim Spielen","Ich will gewinnen","Hauptsache Spaß"],
+["Besondere Momente","Viele Fotos machen","Einfach genießen"],
+["Mein Schreibtisch ist eher…","Aufgeräumt","Kreatives Chaos"],
+["Im Urlaub wichtiger","Gutes Essen","Schöne Natur"],
+["Lieber…","Duschen","Baden"],
+["Bei Problemen…","Frage ich andere um Rat","Löse ich es erst allein"],
+["Eine Nacht…","Im Luxushotel","Im Zelt unterm Sternenhimmel"],
+["Sport","Lieber zuschauen","Lieber selbst machen"],
+["Komplimente lieber für…","Mein Aussehen","Meine Art"],
+["Kontakt halten","Telefonieren","Schreiben"],
+["Liebste Tageszeit","Morgen","Abend"],
+["Beim Menü","Vorspeise","Nachtisch"],
+["Ich bin eher…","Kopfmensch","Bauchmensch"],
+["Für den Rest des Lebens nur noch…","Musik","Filme und Serien"],
+["Mein Geburtstag","Überraschungsparty","Ruhig im kleinen Kreis"],
+["Unterwegs in der Stadt","Fahrrad","Auto"],
+["In einer neuen Stadt","Museen und Kultur","Cafés und Schlendern"],
+["Unerwarteter Geldsegen","Sofort eine Reise buchen","Erst mal sparen"],
+["Lieber…","Kochen","Abwaschen"],
+["Abschalten mit…","Einem Buch","Einem Podcast"],
+["Wenn mich jemand verletzt hat…","Verzeihe ich schnell","Brauche ich länger"],
+["Für einen Tag wäre ich…","Ein Delfin","Ein Adler"],
+["Frühstück","Im Bett","Im Café"],
+["Ich merke mir besser…","Gesichter","Namen"],
+["Am Himmel beobachten","Ein Gewitter","Einen Sonnenuntergang"],
+["Ein Jahr lang…","Berühmt sein","Unsichtbar sein können"],
+["Auf einer Feier","Karaoke singen","Tanzen"],
+["Kraft gibt mir eher…","Etwas zu schaffen","Mich geborgen zu fühlen"],
+["Im Sommer","Freibad","Badesee"],
+["Serien schaue ich…","Eine Folge pro Abend","Eine ganze Staffel am Stück"],
+["Ich bin eher…","Optimist","Realist"],
+["Ein guter Abend hat mehr…","Tiefe Gespräche","Albernen Quatsch"],
+["Bei Entscheidungen bin ich…","Schnell","Gründlich"],
+["Süßes Frühstück","Pfannkuchen","Waffeln"],
+["Eis","Im Becher","In der Waffel"],
+["Was ich mehr genieße","Die Vorfreude","Den Moment selbst"],
+["Traumwohnung","Altbau mit Dielen","Neubau mit Dachterrasse"],
+["Auf einer Party","Viele neue Leute kennenlernen","Mit wenigen lange reden"],
+["Mein Handy-Akku ist meistens…","Gut geladen","Gefährlich leer"],
+["Städtetrip","Kopenhagen","Barcelona"],
+["Am Morgen","Schlummertaste drücken","Sofort aufstehen"],
+["Was beschreibt mich besser?","Neugierig","Gelassen"],
+["Kleidung am liebsten","Bequem","Schick"],
+["Naschen","Schokolade","Gummibärchen"],
+["Ich würde gern lernen…","Ein Instrument","Eine neue Sprache"],
+["Einen Tag lang ohne…","Handy","Kaffee"],
+["Auf dem Jahrmarkt","Achterbahn","Riesenrad"],
+["Lieblingsplatz zu Hause","Sofa","Bett"],
+["Dankbar bin ich gerade vor allem für…","Die Menschen um mich herum","Das, was ich erreicht habe"],
+["Am Wochenende in der Natur","Wandern","Radfahren"],
+["Wenn ich Hunger habe…","Werde ich ungemütlich","Bleibe ich entspannt"],
+["Ein Glas…","Rotwein","Weißwein"],
+["Bei Verabredungen bin ich…","Lieber zu früh da","Auf den letzten Drücker"],
+["Das perfekte Date","Picknick im Park","Schönes Restaurant"],
+["Im Fernsehen lieber","Fußball","Formel 1"],
+["Ich bin eher…","Sammler","Ausmister"],
+["Gemütliches Licht","Kerzen","Lichterkette"],
+["Lieber erleben","Sonnenaufgang","Sonnenuntergang"],
+["Wäre ich ein Getränk…","Espresso","Kakao"],
+["Man soll sich an mich erinnern als…","Witzig","Herzlich"],
+["Im Auto","Laute Musik","Gute Gespräche"],
+["Was mich mehr freut","Ein liebes Wort","Eine kleine Aufmerksamkeit"],
+["Nach einem langen Tag","Erzählen, was los war","Erst mal abschalten"],
+["Ein Abenteuer","Fallschirmsprung","Tauchgang am Riff"],
+["Mein Lebensmotto eher…","Wer wagt, gewinnt","In der Ruhe liegt die Kraft"]
 ];
 
 /* ============================================================
@@ -1231,10 +1763,55 @@ function distractors(f){
 /* ============================================================
    ZUSTAND & NAVIGATION
    ============================================================ */
+/* m = erste Person, p = zweite Person eines Paares */
+const PAIRS = {
+  mp: {m:'Monty', p:'Pia',    a:'#f4a259', b:'#5fc9b5'},
+  jc: {m:'Jakob', p:'Chiara', a:'#8b9cff', b:'#ff8fb8'}
+};
+const NAME = {m:'', p:''};
+const gen = n => /[sxzß]$/.test(n) ? n + "'" : n + 's';
+const tx = s => s.replace(/\{m\}/g, NAME.m).replace(/\{p\}/g, NAME.p)
+                 .replace(/\{M\}/g, gen(NAME.m)).replace(/\{P\}/g, gen(NAME.p));
+
 const KEY = 'montopia-v1';
-let S = {monty:0, pia:0, bestErk:0, bestTurm:0, knotenDone:[]};
-try { S = Object.assign(S, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch(e){}
+const blank = () => ({m:0, p:0, bestErk:0, bestTurm:0, bestHerz:0, knotenDone:[]});
+let S = {pair:null, data:{}};
+try {
+  const old = JSON.parse(localStorage.getItem(KEY) || '{}');
+  if (old.data) S = Object.assign(S, old);
+  else if ('monty' in old) S.data.mp = {m:old.monty, p:old.pia, bestErk:old.bestErk||0,
+                                        bestTurm:old.bestTurm||0, knotenDone:old.knotenDone||[]};
+} catch(e){}
+let D = blank();
 const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} };
+
+function setPair(id){
+  const p = PAIRS[id];
+  S.pair = id;
+  D = S.data[id] = Object.assign(blank(), S.data[id]);
+  NAME.m = p.m; NAME.p = p.p;
+  document.documentElement.style.setProperty('--a', p.a);
+  document.documentElement.style.setProperty('--b', p.b);
+  document.querySelectorAll('[data-t]').forEach(el => el.textContent = tx(el.dataset.t));
+  document.title = 'Montopia · ' + p.m + ' & ' + p.p;
+  renderModes();
+  save(); drawScore(); show('home');
+}
+
+function renderPairs(){
+  $('pairList').innerHTML = Object.keys(PAIRS).map(id => {
+    const p = PAIRS[id], d = S.data[id];
+    const sub = d ? 'Abendstand ' + d.m + ' : ' + d.p : 'Zum ersten Mal dabei';
+    return `<button class="pair" data-pair="${id}" style="--c1:${p.a};--c2:${p.b}">
+      <span class="avs"><span class="av" style="background:${p.a}">${p.m[0]}</span><span class="av" style="background:${p.b}">${p.p[0]}</span></span>
+      <span class="tx"><b>${p.m} &amp; ${p.p}</b><span>${sub}</span></span>
+      <span class="ar">›</span></button>`;
+  }).join('');
+}
+$('pairList').onclick = e => {
+  const t = e.target.closest('[data-pair]');
+  if (t) setPair(t.dataset.pair);
+};
 
 let timerId = null;
 function show(name){
@@ -1243,42 +1820,73 @@ function show(name){
   $('s-'+name).classList.add('on');
   window.scrollTo(0,0);
 }
-function drawScore(){ $('sc-m').textContent = S.monty; $('sc-p').textContent = S.pia; }
+function drawScore(){
+  $('sc-m').textContent = D.m; $('sc-p').textContent = D.p;
+  $('sb-m').classList.toggle('lead', D.m > D.p);
+  $('sb-p').classList.toggle('lead', D.p > D.m);
+}
+
+/* Element-Animation neu anstoßen */
+const bump = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+
+function confetti(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const box = document.createElement('div');
+  box.className = 'confetti';
+  const cols = ['var(--a)','var(--b)','#ffd166','#ff5c93','#7c8cff','#ffffff'];
+  for (let i = 0; i < 90; i++){
+    const c = document.createElement('i');
+    c.style.left = Math.random()*100 + '%';
+    c.style.background = cols[i % cols.length];
+    c.style.setProperty('--dx', (Math.random()*160 - 80) + 'px');
+    c.style.setProperty('--rot', (Math.random()*900 - 450) + 'deg');
+    c.style.animationDuration = (1.6 + Math.random()*1.6) + 's';
+    c.style.animationDelay = (Math.random()*0.4) + 's';
+    if (i % 3 === 0){ c.style.width = '10px'; c.style.height = '10px'; c.style.borderRadius = '50%'; }
+    box.appendChild(c);
+  }
+  document.body.appendChild(box);
+  setTimeout(() => box.remove(), 3800);
+}
 
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-go]');
   if (!t) return;
   const go = t.dataset.go;
   if (go === 'home'){ drawScore(); show('home'); }
+  else if (go === 'who'){ renderPairs(); show('who'); }
   else if (go === 'schaetz-modes'){ show('schaetz-modes'); }
   else if (go === 'erklaer-intro'){ erkIntro(); }
   else if (go === 'knoten-start'){ knStart(); }
   else if (go === 'turm-start'){ tuStart(); }
+  else if (go === 'herz-intro'){ hzIntro(); }
 });
 
 $('newNight').onclick = () => {
-  if (!confirm('Punktestand von Monty und Pia zurücksetzen?')) return;
-  S.monty = 0; S.pia = 0; save(); drawScore();
+  if (!confirm('Punktestand von ' + NAME.m + ' und ' + NAME.p + ' zurücksetzen?')) return;
+  D.m = 0; D.p = 0; save(); drawScore();
 };
 
 /* ============================================================
    SPIEL 1 — SCHÄTZCHEN
    ============================================================ */
 const MODES = [
-  {id:'mc',     ic:'🔢', n:'Qual der Wahl',     d:'Vier Antworten, beide tippen heimlich'},
-  {id:'slider', ic:'🎚️', n:'Daumen mal Pia',    d:'Frei schätzen – wer näher dran ist, gewinnt'},
-  {id:'hilo',   ic:'↕️', n:'Rauf & Runter',     d:'Mehr oder weniger? Abwechselnd geraten'},
-  {id:'price',  ic:'🔥', n:'Heiß & Nah',        d:'Am nächsten dran, ohne drüber zu gehen'},
-  {id:'bluff',  ic:'🎭', n:"Montys Flunkerei",  d:'Einer behauptet, die andere glaubt – oder nicht'},
-  {id:'mix',    ic:'🎲', n:'Wilde Mischung',    d:'Alle fünf Spielarten bunt durcheinander'}
+  {id:'mc',     ic:'🔢', c:'#ff8a5b', n:'Qual der Wahl',    d:'Vier Antworten, beide tippen heimlich'},
+  {id:'slider', ic:'🎚️', c:'#ffc53d', n:'Daumen mal {p}',   d:'Frei schätzen – wer näher dran ist, gewinnt'},
+  {id:'hilo',   ic:'↕️', c:'#3fcfb4', n:'Rauf & Runter',    d:'Mehr oder weniger? Abwechselnd geraten'},
+  {id:'price',  ic:'🔥', c:'#ff5c5c', n:'Heiß & Nah',       d:'Am nächsten dran, ohne drüber zu gehen'},
+  {id:'bluff',  ic:'🎭', c:'#b48cff', n:'{M} Flunkerei',    d:'Eine Person behauptet, die andere glaubt – oder nicht'},
+  {id:'mix',    ic:'🎲', c:'#ff5c93', n:'Wilde Mischung',   d:'Alle fünf Spielarten bunt durcheinander'}
 ];
 
-$('modeList').innerHTML = MODES.map(m =>
-  `<button class="tile" data-mode="${m.id}">
-     <span class="ic">${m.ic}</span>
-     <span class="tx"><b>${m.n}</b><span>${m.d}</span></span>
-     <span class="ar">›</span>
-   </button>`).join('');
+function renderModes(){
+  $('modeList').innerHTML = MODES.map(m =>
+    `<button class="tile" data-mode="${m.id}" style="--c:${m.c}">
+       <span class="ic">${m.ic}</span>
+       <span class="tx"><b>${tx(m.n)}</b><span>${m.d}</span></span>
+       <span class="ar">›</span>
+     </button>`).join('');
+}
 
 $('modeList').onclick = e => {
   const t = e.target.closest('[data-mode]');
@@ -1315,7 +1923,7 @@ function sgStart(mode){
   const facts = pickFacts(12);
   let pi = 0, fi = 0;
   SG.qs.forEach(q => { q.mode === 'hilo' ? (q.pair = pairs[pi++] || pairs[0]) : (q.fact = facts[fi++]); });
-  $('sg-title').textContent = MODES.find(m => m.id === mode).n;
+  $('sg-title').textContent = tx(MODES.find(m => m.id === mode).n);
   show('schaetz');
   sgQuestion();
 }
@@ -1333,7 +1941,6 @@ function sgQuestion(){
   else sgSecretPrompt(SG.first);
 }
 
-const NAME = {m:'Monty', p:'Pia'};
 const otherOf = w => w === 'm' ? 'p' : 'm';
 
 function sgSecretPrompt(who){
@@ -1522,24 +2129,25 @@ function sgNextBtn(){
   const last = SG.i === SG.qs.length - 1;
   $('sg-foot').innerHTML =
     `<div class="rows"><div class="rw">
-       <span class="nm" style="color:var(--monty)">${SG.m}</span>
+       <span class="nm" style="color:var(--a)">${SG.m}</span>
        <span class="vl" style="text-align:center;color:var(--muted)">Zwischenstand</span>
-       <span class="nm" style="color:var(--pia);text-align:right">${SG.p}</span>
+       <span class="nm" style="color:var(--b);text-align:right">${SG.p}</span>
      </div></div>
      <button class="btn primary big" id="sg-next">${last ? 'Runde auswerten' : 'Nächste Frage'}</button>`;
   $('sg-next').onclick = () => { SG.i++; sgQuestion(); };
 }
 
 function sgEnd(){
-  S.monty += SG.m; S.pia += SG.p; save();
-  const win = SG.m > SG.p ? 'Monty' : SG.p > SG.m ? 'Pia' : null;
+  D.m += SG.m; D.p += SG.p; save();
+  const win = SG.m > SG.p ? NAME.m : SG.p > SG.m ? NAME.p : null;
   $('sg-step').textContent = '';
   $('sg-body').innerHTML =
     `<div class="final">
        <b>${SG.m} : ${SG.p}</b>
        <span>${win ? win + ' gewinnt die Runde' : 'Unentschieden'}</span>
-       <div class="badge">Abendstand: Monty ${S.monty} · Pia ${S.pia}</div>
+       <div class="badge">Abendstand: ${NAME.m} ${D.m} · ${NAME.p} ${D.p}</div>
      </div>`;
+  if (win) confetti();
   $('sg-foot').innerHTML =
     `<button class="btn primary" id="sg-again">Noch eine Runde</button>
      <button class="btn ghost" data-go="home">Zurück zur Übersicht</button>`;
@@ -1547,12 +2155,13 @@ function sgEnd(){
 }
 
 /* ============================================================
-   SPIEL 2 — MONTY ERKLÄRT'S
+   SPIEL 2 — ERKLÄREN
    ============================================================ */
 const ERK = {round:1, who:'m', hit:0, skip:0, total:0, pool:[], left:60};
+const RING = 339.3;
 
 function erkIntro(){
-  $('erk-best').textContent = S.bestErk ? 'Euer Bestwert: ' + S.bestErk + ' Begriffe' : '';
+  $('erk-best').textContent = D.bestErk ? 'Euer Bestwert: ' + D.bestErk + ' Begriffe' : '';
   show('erklaer-intro');
 }
 $('erk-start').onclick = () => { ERK.total = 0; erkRound(1); };
@@ -1568,13 +2177,16 @@ function erkRound(r){
   $('erk-skip').textContent = 0;
   $('erk-word').textContent = ERK.pool.pop();
   $('erk-timer').textContent = 60;
-  $('erk-timer').classList.remove('low');
+  $('erk-ring').style.strokeDashoffset = 0;
+  $('erk-ringBox').classList.remove('low');
   show('erklaer');
   const t0 = Date.now();
   timerId = setInterval(() => {
-    ERK.left = Math.max(0, 60 - Math.floor((Date.now()-t0)/1000));
+    const ms = Date.now() - t0;
+    ERK.left = Math.max(0, 60 - Math.floor(ms/1000));
     $('erk-timer').textContent = ERK.left;
-    $('erk-timer').classList.toggle('low', ERK.left <= 10);
+    $('erk-ring').style.strokeDashoffset = RING * Math.min(1, ms/60000);
+    $('erk-ringBox').classList.toggle('low', ERK.left <= 10);
     if (ERK.left === 0){ clearInterval(timerId); timerId = null; erkDone(); }
   }, 200);
 }
@@ -1582,24 +2194,25 @@ function erkRound(r){
 function erkWord(){
   if (!ERK.pool.length) ERK.pool = shuffle(TERMS.slice());
   $('erk-word').textContent = ERK.pool.pop();
+  bump($('erk-word'), 'pop');
 }
-$('erk-hitBtn').onclick = () => { ERK.hit++; $('erk-hit').textContent = ERK.hit; erkWord(); };
+$('erk-hitBtn').onclick = () => { ERK.hit++; $('erk-hit').textContent = ERK.hit; bump($('erk-hit'), 'pop'); erkWord(); };
 $('erk-pass').onclick   = () => { ERK.skip++; $('erk-skip').textContent = ERK.skip; erkWord(); };
 
 function erkDone(){
   ERK.total += ERK.hit;
   if (ERK.round === 1){
     $('erk-final').innerHTML =
-      `<b>${ERK.hit}</b><span>Monty hat ${ERK.hit} Begriffe geschafft.<br>Jetzt ist Pia dran.</span>`;
-    $('erk-again').textContent = 'Pia starten';
+      `<b>${ERK.hit}</b><span>${NAME.m} hat ${ERK.hit} Begriffe geschafft.<br>Jetzt ist ${NAME.p} dran.</span>`;
+    $('erk-again').textContent = NAME.p + ' starten';
     $('erk-again').onclick = () => erkRound(2);
   } else {
-    const rec = ERK.total > S.bestErk;
-    if (rec){ S.bestErk = ERK.total; save(); }
+    const rec = ERK.total > D.bestErk;
+    if (rec){ D.bestErk = ERK.total; save(); confetti(); }
     $('erk-final').innerHTML =
-      `<b>${ERK.total}</b><span>Begriffe zusammen · Monty ${ERK.total-ERK.hit} + Pia ${ERK.hit}</span>
+      `<b>${ERK.total}</b><span>Begriffe zusammen · ${NAME.m} ${ERK.total-ERK.hit} + ${NAME.p} ${ERK.hit}</span>
        ${rec ? '<div class="badge">Neuer Bestwert!</div>'
-             : `<div class="badge" style="background:var(--surface2);color:var(--muted)">Bestwert: ${S.bestErk}</div>`}`;
+             : `<div class="badge dim">Bestwert: ${D.bestErk}</div>`}`;
     $('erk-again').textContent = 'Noch eine Runde';
     $('erk-again').onclick = () => { ERK.total = 0; erkRound(1); };
   }
@@ -1607,13 +2220,13 @@ function erkDone(){
 }
 
 /* ============================================================
-   SPIEL 3 — PIAS KNOTEN
+   SPIEL 3 — KNOTEN
    ============================================================ */
-const KN = {p:null, idx:0, sel:[], solved:[], lives:4};
+const KN = {p:null, idx:0, sel:[], solved:[], lives:4, fresh:false};
 
 function knStart(){
-  let open = KNOTEN.map((_,i) => i).filter(i => !S.knotenDone.includes(i));
-  if (!open.length){ S.knotenDone = []; save(); open = KNOTEN.map((_,i) => i); }
+  let open = KNOTEN.map((_,i) => i).filter(i => !D.knotenDone.includes(i));
+  if (!open.length){ D.knotenDone = []; save(); open = KNOTEN.map((_,i) => i); }
   knLoad(open[rnd(open.length)]);
 }
 
@@ -1624,14 +2237,18 @@ function knLoad(idx){
   KN.words = shuffle(KN.p.g.flatMap(g => g.slice(1)));
   $('kn-title').textContent = KN.p.t;
   $('kn-hint').textContent = 'Findet vier Gruppen mit je vier Wörtern.';
-  $('kn-step').textContent = (S.knotenDone.length+1) + '/' + KNOTEN.length;
+  $('kn-step').textContent = (D.knotenDone.length+1) + '/' + KNOTEN.length;
   knDraw();
   show('knoten');
 }
 
+const grpHtml = (g, isNew) =>
+  `<div class="grp ${isNew ? 'new' : ''}"><b>${g[0]}</b><span>${g.slice(1).join(' · ')}</span></div>`;
+
 function knDraw(){
-  $('kn-solved').innerHTML = KN.solved.map(g =>
-    `<div class="grp"><b>${g[0]}</b><span>${g.slice(1).join(' · ')}</span></div>`).join('');
+  $('kn-solved').innerHTML = KN.solved.map((g,i) =>
+    grpHtml(g, KN.fresh && i === KN.solved.length-1)).join('');
+  KN.fresh = false;
   $('kn-grid').innerHTML = KN.words.map(w =>
     `<button class="cell ${KN.sel.includes(w)?'sel':''}" data-w="${w}">${w}</button>`).join('');
   $('kn-grid').querySelectorAll('.cell').forEach(c => c.onclick = () => {
@@ -1650,10 +2267,11 @@ $('kn-check').onclick = () => {
   const group = KN.p.g.find(g => KN.sel.every(w => g.includes(w)));
   if (group){
     KN.solved.push(group);
+    KN.fresh = true;
     KN.words = KN.words.filter(w => !group.includes(w));
     KN.sel = [];
     if (KN.solved.length === 4){
-      if (!S.knotenDone.includes(KN.idx)){ S.knotenDone.push(KN.idx); save(); }
+      if (!D.knotenDone.includes(KN.idx)){ D.knotenDone.push(KN.idx); save(); }
       return knEnd(true);
     }
     knDraw();
@@ -1661,28 +2279,25 @@ $('kn-check').onclick = () => {
   }
   const near = KN.p.g.some(g => KN.sel.filter(w => g.includes(w)).length === 3);
   KN.lives--;
-  $('kn-grid').querySelectorAll('.cell.sel').forEach(c => {
-    c.classList.add('shake');
-    setTimeout(() => c.classList.remove('shake'), 350);
-  });
+  $('kn-grid').querySelectorAll('.cell.sel').forEach(c => bump(c, 'shake'));
   $('kn-hint').textContent = near ? 'Ganz nah dran – ein Wort gehört woanders hin.'
                                   : 'Nicht ganz. Findet vier Gruppen mit je vier Wörtern.';
-  if (KN.lives <= 0) setTimeout(() => knEnd(false), 400);
-  else { KN.sel = []; knDraw(); }
+  if (KN.lives <= 0) setTimeout(() => knEnd(false), 450);
+  else setTimeout(() => { KN.sel = []; knDraw(); }, 420);
 };
 
 function knEnd(won){
   $('kn-final').innerHTML = won
     ? `<b>Geknackt!</b><span>Alle vier Gruppen gefunden – mit ${4-KN.lives} ${4-KN.lives===1?'Fehler':'Fehlern'}.</span>`
     : `<b>Verknotet</b><span>Diesmal nicht – hier war die Lösung:</span>`;
-  $('kn-reveal').innerHTML = KN.p.g.map(g =>
-    `<div class="grp"><b>${g[0]}</b><span>${g.slice(1).join(' · ')}</span></div>`).join('');
+  $('kn-reveal').innerHTML = KN.p.g.map(g => grpHtml(g, true)).join('');
   show('knoten-end');
+  if (won) confetti();
 }
 $('kn-next').onclick = knStart;
 
 /* ============================================================
-   SPIEL 4 — MONTYS TURM
+   SPIEL 4 — TURM
    ============================================================ */
 const TU = {h:0, lives:3, pool:[], cur:null};
 
@@ -1693,19 +2308,25 @@ function tuStart(){
   show('turm');
 }
 
+function tuDraw(grew){
+  const n = Math.min(TU.h, 14);
+  $('tu-h').textContent = TU.h;
+  $('tu-tower').innerHTML = Array.from({length:n}, (_,i) =>
+    `<div class="brick ${grew && i === n-1 ? 'new' : ''}"></div>`).join('');
+  $('tu-lives').innerHTML = [0,1,2].map(i =>
+    `<span class="dot ${i < TU.lives ? '' : 'off'}"></span>`).join(' ');
+}
+
 function tuNext(){
   if (!TU.pool.length) TU.pool = shuffle(WF.slice());
   TU.cur = TU.pool.pop();
   $('tu-stmt').textContent = TU.cur.s;
   $('tu-verdict').textContent = '';
-  $('tu-h').textContent = TU.h;
-  $('tu-lives').innerHTML = [0,1,2].map(i =>
-    `<span class="dot ${i < TU.lives ? '' : 'off'}"></span>`).join(' ');
-  $('tu-tower').innerHTML = Array(Math.min(TU.h,14)).fill('<div class="brick"></div>').join('');
+  tuDraw(false);
   $('tu-foot').innerHTML =
     `<div class="two">
-       <button class="btn pia" id="tu-true">Wahr</button>
-       <button class="btn monty" id="tu-false">Falsch</button>
+       <button class="btn p" id="tu-true">Wahr</button>
+       <button class="btn m" id="tu-false">Falsch</button>
      </div>`;
   $('tu-true').onclick  = () => tuAnswer(true);
   $('tu-false').onclick = () => tuAnswer(false);
@@ -1714,10 +2335,8 @@ function tuNext(){
 function tuAnswer(said){
   const ok = said === TU.cur.w;
   if (ok) TU.h++; else TU.lives--;
-  $('tu-h').textContent = TU.h;
-  $('tu-tower').innerHTML = Array(Math.min(TU.h,14)).fill('<div class="brick"></div>').join('');
-  $('tu-lives').innerHTML = [0,1,2].map(i =>
-    `<span class="dot ${i < TU.lives ? '' : 'off'}"></span>`).join(' ');
+  tuDraw(ok);
+  if (!ok) bump($('tu-tower'), 'shake');
   $('tu-verdict').className = 'verdict ' + (ok ? 'ok' : 'no');
   $('tu-verdict').innerHTML =
     (ok ? 'Richtig!' : 'Leider falsch.') +
@@ -1729,20 +2348,117 @@ function tuAnswer(said){
 }
 
 function tuEnd(){
-  const rec = TU.h > S.bestTurm;
-  if (rec){ S.bestTurm = TU.h; save(); }
+  const rec = TU.h > D.bestTurm;
+  if (rec){ D.bestTurm = TU.h; save(); }
   $('tu-final').innerHTML =
     `<b>${TU.h}</b><span>Steine hoch</span>
      ${rec ? '<div class="badge">Neuer Bestwert!</div>'
-           : `<div class="badge" style="background:var(--surface2);color:var(--muted)">Bestwert: ${S.bestTurm}</div>`}`;
+           : `<div class="badge dim">Bestwert: ${D.bestTurm}</div>`}`;
   show('turm-end');
+  if (rec) confetti();
 }
 $('tu-again').onclick = tuStart;
 
 /* ============================================================
+   SPIEL 5 — HERZBLATT
+   ============================================================ */
+const HZ = {n:10, i:0, pool:[], qs:[], hits:{m:0, p:0}, self:'m', pick:0};
+
+function hzIntro(){
+  $('hz-best').textContent = D.bestHerz ? 'Euer Bestwert: ' + D.bestHerz + ' von ' + HZ.n : '';
+  show('herz-intro');
+}
+$('hz-start').onclick = hzStart;
+
+function hzStart(){
+  if (HZ.pool.length < HZ.n) HZ.pool = shuffle(HERZ.slice());
+  HZ.qs = HZ.pool.splice(0, HZ.n).map(q => q.slice());
+  HZ.i = 0; HZ.hits = {m:0, p:0};
+  show('herz');
+  hzPrompt();
+}
+
+const hzHearts = () => `<div class="hearts">${HZ.qs.map((_,k) =>
+  `<span class="${k < HZ.i && HZ.qs[k].hit ? '' : 'off'}">💗</span>`).join('')}</div>`;
+
+function hzPrompt(){
+  if (HZ.i >= HZ.n) return hzEnd();
+  const self = HZ.self = HZ.i % 2 === 0 ? 'm' : 'p';
+  $('hz-step').textContent = (HZ.i+1) + ' / ' + HZ.n;
+  $('hz-body').innerHTML =
+    `<div class="kicker ${self}">${NAME[self]} ist dran</div>
+     <div class="question">${NAME[otherOf(self)]}, bitte kurz wegschauen.</div>
+     <div class="hintline">${NAME[self]} beantwortet gleich ehrlich eine Frage über sich selbst.</div>`;
+  $('hz-foot').innerHTML = `<button class="btn ${self} big" id="hz-ready">Ich bin bereit</button>`;
+  $('hz-ready').onclick = hzSelf;
+}
+
+const hzOpts = q => `<div class="opts">${[1,2].map(k =>
+  `<button class="opt" data-k="${k}">${q[k]}</button>`).join('')}</div>`;
+
+function hzSelf(){
+  const q = HZ.qs[HZ.i], self = HZ.self;
+  $('hz-body').innerHTML =
+    `<div class="kicker ${self}">${NAME[self]} · über dich</div>
+     <div class="question">${q[0]}</div>${hzOpts(q)}`;
+  $('hz-foot').innerHTML = '';
+  $('hz-body').querySelectorAll('.opt').forEach(b => b.onclick = () => { HZ.pick = +b.dataset.k; hzGuess(); });
+}
+
+function hzGuess(){
+  const q = HZ.qs[HZ.i], self = HZ.self, other = otherOf(self);
+  $('hz-body').innerHTML =
+    `<div class="kicker ${other}">${NAME[other]} rät</div>
+     <div class="question">${q[0]}</div>
+     <div class="hintline">Was hat ${NAME[self]} gewählt?</div>${hzOpts(q)}`;
+  $('hz-foot').innerHTML = '';
+  $('hz-body').querySelectorAll('.opt').forEach(b => b.onclick = () => hzReveal(+b.dataset.k));
+}
+
+function hzReveal(guess){
+  const q = HZ.qs[HZ.i], self = HZ.self, other = otherOf(self);
+  const hit = q.hit = guess === HZ.pick;
+  if (hit) HZ.hits[other]++;
+  $('hz-body').innerHTML =
+    `<div class="truth text"><span>${NAME[self]} hat gewählt</span><b>${q[HZ.pick]}</b><i>${q[0]}</i></div>
+     <div class="verdict ${hit ? 'ok' : 'no'}">${hit ? 'Treffer! 💞' : NAME[other] + ' hat auf „' + q[guess] + '“ getippt'}</div>
+     <div class="hintline" style="text-align:center">${hit ? 'Wusstest du auch, warum?' : 'Erzähl mal – warum eigentlich?'}</div>`;
+  HZ.i++;
+  const last = HZ.i >= HZ.n;
+  $('hz-foot').innerHTML = hzHearts() +
+    `<button class="btn primary big" id="hz-next">${last ? 'Auswerten' : 'Nächste Frage'}</button>`;
+  $('hz-next').onclick = hzPrompt;
+}
+
+function hzEnd(){
+  const total = HZ.hits.m + HZ.hits.p;
+  const rec = total > D.bestHerz;
+  if (rec){ D.bestHerz = total; save(); }
+  const tier = total >= 9 ? 'Seelenverwandt 💞'
+             : total >= 7 ? 'Ein starkes Team'
+             : total >= 4 ? 'Gut eingespielt'
+             : 'Da gibt’s noch viel zu entdecken';
+  $('hz-step').textContent = '';
+  $('hz-body').innerHTML =
+    `<div class="final"><b>${total} / ${HZ.n}</b><span>${tier}</span>
+       ${rec ? '<div class="badge">Neuer Bestwert!</div>' : `<div class="badge dim">Bestwert: ${D.bestHerz}</div>`}</div>
+     <div class="meter"><i id="hz-meter"></i></div>
+     <div class="rows">
+       <div class="rw p"><span class="nm">${NAME.p}</span><span class="vl">hat ${NAME.m} durchschaut</span><span class="pt">${HZ.hits.p} / ${HZ.n/2}</span></div>
+       <div class="rw m"><span class="nm">${NAME.m}</span><span class="vl">hat ${NAME.p} durchschaut</span><span class="pt">${HZ.hits.m} / ${HZ.n/2}</span></div>
+     </div>`;
+  $('hz-foot').innerHTML =
+    `<button class="btn primary" id="hz-again">Noch eine Runde</button>
+     <button class="btn ghost" data-go="home">Zurück zur Übersicht</button>`;
+  $('hz-again').onclick = hzStart;
+  setTimeout(() => { $('hz-meter').style.width = (total / HZ.n * 100) + '%'; }, 80);
+  if (rec || total >= 7) confetti();
+}
+
+/* ============================================================
    START
    ============================================================ */
-drawScore();
+renderPairs();
 if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0){
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }

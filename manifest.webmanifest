@@ -1,7 +1,7 @@
 {
-  "name": "Montopia – Spieleabend für Monty & Pia",
+  "name": "Montopia – Spieleabend für zwei",
   "short_name": "Montopia",
-  "description": "Vier Spiele für zwei auf dem Sofa: Schätzchen, Monty erklärt's, Pias Knoten und Montys Turm.",
+  "description": "Fünf Spiele für zwei auf dem Sofa: Schätzchen, Herzblatt, Erklären, Knoten und Turm.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
